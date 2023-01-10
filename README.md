@@ -2,7 +2,7 @@
 浙江理工大学ACM集训队22届队员整理的一些ACM-ICPC板子
 
 ## UPD 230110
-在 `Jamhus_Tao` 分支上传了 `GreatLiangpi` 的板子。  
+在 `Jamhus_Tao` 分支上传了 `GreatLiangpi` 的板子(已合并到主分支)。  
 板子全部在同一文件 `Function2.0.cpp` 由 `namespace` 分割不同的板子模块。  
 **注意：** 板子已发现并未修复的问题：
 1. 高精度算法仅支持整数运算，为摘自网络的工程模板，尚未进行效率优化。主要问题包括：  
