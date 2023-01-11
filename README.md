@@ -12,3 +12,7 @@
     * `详见 Function2.0.cpp::BigInteger`
 2. 哈希表的实现暂时存在 `BUG` ，哈希表的实现初中是取代 `std::unordered_map` 而获取优良的时间复杂度，目前在简单测试环境获取了相对于 `std::unordered_map` 的 `50倍` 效率，但是存在未知下标越界问题，欢迎提供修正意见。
     * `详见 Function2.0.cpp::hash::HashMap`
+
+## UPD 230111
+`Jamhus_Tao` 分支已合并到 `main` 分支。  
+`Jamhus_Tao` 分支已移除。  
