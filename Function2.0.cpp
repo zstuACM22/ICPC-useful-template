@@ -31,7 +31,7 @@ namespace l78z
     int sscanf(const char *_source, const char *_format, ...); // similar to scanf but read from _source
     int sprintf(char *__stream, const char *__format, ...);    // similar to printf but write to __stream
 
-    void *memset(void *_Dst, int _Val, size_t _Size);                                 // set the same value in the memory byte by byte
+    void fill(vector<int>::iterator _first, vector<int>::iterator _last, int _value); // set same value _value
     void iota(vector<int>::iterator _first, vector<int>::iterator _last, int _value); // set increasing value started from _value
 }
 
@@ -2641,7 +2641,7 @@ namespace graph
         void bfs()
         {
             que.push(st);
-            memset(track, -1, sizeof(track));
+            fill(track, track + n + 1, -1);
             track[st.x][st.y] = 0;
             while (not que.empty() and track[ed.x][ed.y] == -1)
             {
@@ -2719,21 +2719,22 @@ namespace graph
     // 最短路径
     namespace shortest_rount
     {
-        // dijkstra - 堆优化 O(mlogn)
+        // dijkstra - 堆优化 O((n+m)logn)
         namespace dijkstra
         {
             // 邻接表存图
-            const int MAX = 1005;
+            const int MAX = 100005;
+            const int INF = 0x3f3f3f3f3f3f3f3fll;
             vector<pair<int, int>> edge[MAX];
             int dis[MAX];
             bool vis[MAX];
 
             // dijkstra 单源多点最短路径 正边 堆优化 O((n+m)log(n))
             // 参数: st: 起点.
-            void dijkstra(int st)
+            void dijkstra(int st, int n)
             {
-                memset(dis, 0x3f, sizeof(dis));
-                memset(vis, false, sizeof(vis));
+                fill(dis, dis + n + 1, INF);
+                fill(vis, vis + n + 1, false);
                 priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> heap;
                 dis[st] = 0;
                 heap.push({0, st});
@@ -2793,7 +2794,8 @@ namespace graph
         // spfa - bellman队列优化 O(m) -> O(mn)
         namespace spfa
         {
-            const int MAX = 1005;
+            const int MAX = 100005;
+            const int INF = 0x3f3f3f3f3f3f3f3fll;
 
             // 邻接表存图
             vector<pair<int, int>> edge[MAX];
@@ -2805,9 +2807,9 @@ namespace graph
             // 参数: st: 起点, n: 点数. 返回: 是否不存在负环.
             bool spfa(int st, int n)
             {
-                memset(dis, 0x3f, sizeof(int) * (n + 1));
-                memset(vis, false, sizeof(int) * (n + 1));
-                memset(cou, 0, sizeof(int) * (n + 1));
+                fill(dis, dis + n + 1, INF);
+                fill(vis, vis + n + 1, false);
+                fill(cou, cou + n + 1, 0);
                 dis[st] = 0;
                 vis[st] = true;
                 queue<int> que;
