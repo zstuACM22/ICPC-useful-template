@@ -1238,6 +1238,8 @@ namespace data_structure
     // 莫队. 时间: O(n^1.5), 内存: O(n)
     namespace mos
     {
+        // More: 带修莫队, 回滚莫队, 树上莫队, 二次离线莫队, 在线莫队
+
         // 基础莫队 - 以 区间互异性 为例.
         namespace static_mos
         {
@@ -1317,36 +1319,6 @@ namespace data_structure
                     else
                         cout << "No" << endl;
             }
-
-        }
-
-        // 带修莫队
-        namespace modifiable_mos
-        {
-
-        }
-
-        // 回滚莫队
-        namespace rollback_mos
-        {
-
-        }
-
-        // 树上莫队
-        namespace mos_on_tree
-        {
-
-        }
-
-        // 二次离线莫队
-        namespace mos_twice
-        {
-
-        }
-
-        // 在线莫队
-        namespace mos_online
-        {
 
         }
     }
@@ -1815,6 +1787,8 @@ namespace data_structure
     // 并查集. 时间: O(1), 内存: O(n)
     namespace union_find_set
     {
+        // More: 反集, 可持久化并查集, 树上启发式合并
+
         // 基础并查集. 时间: O(1), 内存: O(n)
         namespace union_find_set
         {
@@ -1866,18 +1840,6 @@ namespace data_structure
                     father[x] = y;
                 }
             }
-        }
-
-        // 可持久化并查集. 时间: O(logn), 内存: O(n)
-        namespace persistent_dsu
-        {
-
-        }
-
-        // 树上启发式合并. 时间: O(nlogn), 内存: ?
-        namespace dsu_on_tree
-        {
-
         }
     }
 
@@ -2615,6 +2577,8 @@ namespace graph
     // 广度优先搜索 - 以 最少转弯问题 为例
     namespace breadth_first_search
     {
+        // More: Meet in the middle, 01 bfs, dijkstra 堆优化
+
         // 矩阵上广搜. 时间复杂度: O(sn^2) (s 为 next_ 数组大小)
         namespace bfs_on_grid
         {
@@ -3447,6 +3411,69 @@ namespace graph
                     y = st[y][k];
                 }
             return st[x][0];
+        }
+    }
+
+    // 树上启发式合并. 以 树上颜色合并 为例
+    namespace dsu_on_tree {
+        const int MAX = 100005;
+
+        int n;
+        vector<int> edge[MAX];
+        int color[MAX];
+        int sons[MAX];
+        int heavy[MAX];
+        int cnt[MAX], max_ = 0, cc = 0;
+        int res[MAX];
+
+        // 标记重链
+        int dfs(int x, int pre) {
+            int cnt = 1;
+            int ymax = 0, max_ = 0;
+            for (int y : edge[x]) {
+                if (y == pre) continue;
+                int tmp = dfs(y, x);
+                if (max_ < tmp) {
+                    max_ = tmp;
+                    ymax = y;
+                }
+                cnt += tmp;
+            }
+            heavy[x] = ymax;
+            return cnt;
+        }
+
+        // 计算贡献
+        void calc(int x, int pre, int heavy_son, int val) {
+            for (int y : edge[x]) {
+                if (y == pre or y == heavy_son) continue;
+                calc(y, x, heavy_son, val);
+            }
+            cnt[color[x]] += val;
+            if (cnt[color[x]] == max_) {
+                cc += color[x];
+            } else if (cnt[color[x]] > max_) {
+                max_ = cnt[color[x]];
+                cc = color[x];
+            }
+        }
+
+        // 树上启发式合并
+        void dsu(int x, int pre, bool keep) {
+            for (int y : edge[x]) {
+                if (y == pre or y == heavy[x]) continue;
+                dsu(y, x, false);
+            }
+            if (heavy[x]) {
+                dsu(heavy[x], x, true);
+            }
+            calc(x, pre, heavy[x], 1);
+            res[x] = cc;
+            if (not keep) {
+                calc(x, pre, 0, -1);
+                max_ = 0;
+                cc = 0;
+            }
         }
     }
 }
