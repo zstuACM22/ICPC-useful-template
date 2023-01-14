@@ -8,6 +8,11 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
+// 遇到以下问题, 请给自己两个巴掌:
+// 1. 多组输入全局数组没有清干净. 可能是存边的 vector, 计数的 map, 可能是数组.
+// 2. 是不是又忘改 MAX 参数了.
+// 3. for (int i = n; i > 0; i++).
+
 // 乱七八糟
 namespace l78z
 {
@@ -670,25 +675,6 @@ namespace math
             bool vis[MAX] = {0};
             int prime[MAX];
 
-            // 埃氏筛(优化朴素筛). 参数: 筛上界. 返回: 质数个数. 复杂度: O(nloglogn).
-            int prime_sieve_eratosthenes(int n)
-            {
-                int cnt = 0;
-                vis[1] = true;
-                for (int i = 2; i <= n; i++)
-                {
-                    if (not vis[i])
-                    {
-                        prime[cnt++] = i;
-                        for (int j = i * i; j <= n; j += i)
-                        {
-                            vis[j] = true;
-                        }
-                    }
-                }
-                return cnt;
-            }
-
             // 欧拉筛(线性筛). 参数: 筛上界. 返回: 质数个数. 复杂度: O(n)
             int prime_sieve_euler(int n)
             {
@@ -717,6 +703,25 @@ namespace math
                             然而每个数 (非1正整数) 有且仅有一个最小质因数,
                             因此每个 vis 元素仅被访问一次,
                             复杂度为 O(n).  */
+                    }
+                }
+                return cnt;
+            }
+
+            // Useless - 埃氏筛(优化朴素筛). 参数: 筛上界. 返回: 质数个数. 复杂度: O(nloglogn).
+            int prime_sieve_eratosthenes(int n)
+            {
+                int cnt = 0;
+                vis[1] = true;
+                for (int i = 2; i <= n; i++)
+                {
+                    if (not vis[i])
+                    {
+                        prime[cnt++] = i;
+                        for (int j = i * i; j <= n; j += i)
+                        {
+                            vis[j] = true;
+                        }
                     }
                 }
                 return cnt;
@@ -1356,13 +1361,13 @@ namespace data_structure
     namespace segment_tree
     {
         // 基础线段树
-        namespace non_tagged
+        namespace non_tagged_segment_tree
         {
 
         }
 
         // 带lazy标记的线段树 - 以 区间求和-区间修改 为例. 局限性: 近二十倍大常数
-        namespace lazy_tagged
+        namespace lazy_tagged_segment_tree
         {
             const int MAX = 100005;
 
@@ -1488,7 +1493,7 @@ namespace data_structure
         }
 
         // 带权线段树 - 以 计数小于x-单点修改 为例. 局限性: 不离散数域决定内存, 离散化或将约束修改
-        namespace weighted
+        namespace weighted_segment_tree
         {
             const int MAX = 100005;
 
@@ -1559,7 +1564,7 @@ namespace data_structure
         }
 
         // 可持续化线段树(主席树) - 以 计数区间第k小为例. 时间: O(logn) + 预处理: O(n), 内存: O(4n+3i+ilogn)
-        namespace persistent
+        namespace persistent_segment_tree
         {
             const int MAXI = 30005;
             const int MAXN = 30005;
@@ -1629,7 +1634,7 @@ namespace data_structure
             }
 
             // 区间查询  // Attention
-            int search(SegmentTree &node, int x)
+            int search(const SegmentTree &node, int x)
             {
                 int l = 0, r = node.version.size() - 1;
                 while (l <= r)
@@ -1742,132 +1747,138 @@ namespace data_structure
         }
     }
 
-    // 单调栈 - 以 最近左较小值 为例. 时间: O(n), 内存: O(n)
-    namespace humdrum_stack
+    // 单调数据结构. 单调栈 & 单调队列(滑动窗口)
+    namespace humdrum_structure
     {
-        // 1-index
-        const int MAX = 1000005;
-        int a[MAX];
-
-        void solve()
+        // 单调栈 - 以 最近左较小值 为例. 时间: O(n), 内存: O(n)
+        namespace humdrum_stack
         {
-            int n;
-            cin >> n;
-            for (int i = 1; i <= n; i++)
-                cin >> a[i];
+            // 1-index
+            const int MAX = 1000005;
+            int a[MAX];
 
-            stack<int> stk; // 单增
-            stk.push(-1);   // print -1 if no result, should be small enough
-            for (int i = 1; i <= n; i++)
+            // 单调栈有时需要正反各一遍
+            void solve()
             {
-                while (stk.top() >= a[i])
-                    stk.pop();
-                cout << stk.top() << ' ';
-                stk.push(a[i]);
+                int n;
+                cin >> n;
+                for (int i = 1; i <= n; i++)
+                    cin >> a[i];
+
+                stack<pair<int, int>> stk; // 单增
+                stk.push({0, -1});         // Attention: 足够小(如果单增)
+                for (int i = 1; i <= n; i++)
+                {
+                    while (stk.top().second >= a[i]) // Attention
+                        stk.pop();
+                    cout << stk.top().second << ' ';
+                    stk.push({i, a[i]});
+                }
+                cout << endl;
             }
-            cout << endl;
+        }
+
+        // 单调队列 - 以 滑块最小值 为例. 时间: O(n), 内存: O(n)
+        namespace humdrum_queue
+        {
+            // 1-index
+            const int MAX = 1000005;
+            int a[MAX];
+
+            void solve()
+            {
+                int n, m;
+                cin >> n >> m;
+                for (int i = 1; i <= n; i++)
+                    cin >> a[i];
+
+                deque<int> que; // 单增
+                for (int i = 1; i < m; i++)
+                {
+                    while (not que.empty() and que.back() > a[i]) // Attention
+                        que.pop_back();
+                    que.push_back(a[i]);
+                }
+                for (int i = 1; i <= n - m + 1; i++)
+                {
+                    while (not que.empty() and que.back() > a[i + m - 1]) // Attention
+                        que.pop_back();
+                    que.push_back(a[i + m - 1]);
+                    cout << que.front() << endl;
+                    if (que.front() == a[i])
+                        que.pop_front();
+                }
+            }
         }
     }
 
-    // 单调队列 - 以 滑块最小值 为例. 时间: O(n), 内存: O(n)
-    namespace humdrum_queue
-    {
-        // 1-index
-        const int MAX = 1000005;
-        int a[MAX];
-
-        void solve()
-        {
-            int n, m;
-            cin >> n >> m;
-            for (int i = 1; i <= n; i++)
-                cin >> a[i];
-
-            deque<int> que; // 单增
-            for (int i = 1; i < m; i++)
-            {
-                while (not que.empty() and que.back() > a[i])
-                    que.pop_back();
-                que.push_back(a[i]);
-            }
-            for (int i = 1; i <= n - m + 1; i++)
-            {
-                while (not que.empty() and que.back() > a[i + m - 1])
-                    que.pop_back();
-                que.push_back(a[i + m - 1]);
-                cout << que.front() << endl;
-                if (que.front() == a[i])
-                    que.pop_front();
-            }
-        }
-    }
-
-    // 并查集. 时间: O(q), 内存: O(n)
+    // 并查集. 时间: O(1), 内存: O(n)
     namespace union_find_set
     {
-        // 1-index
-        const int MAX = 1000005;
-
-        int father[MAX];
-        int edges[MAX]; // 集合边数
-        int nodes[MAX]; // 集合点数
-
-        // 初始化
-        void init(int n)
+        // 基础并查集. 时间: O(1), 内存: O(n)
+        namespace union_find_set
         {
-            for (int i = 1; i <= n; i++)
+            // 1-index
+            const int MAX = 1000005;
+
+            int father[MAX];
+            int edges[MAX]; // 集合边数
+            int nodes[MAX]; // 集合点数
+
+            // 初始化  // Attention
+            void init(int n)
             {
-                father[i] = i;
-                edges[i] = 0;
-                nodes[i] = 1;
+                for (int i = 1; i <= n; i++)
+                {
+                    father[i] = i;
+                    edges[i] = 0;
+                    nodes[i] = 1;
+                }
+            }
+
+            // 状态合并方程  // Attention
+            void state_merge(int x, int y)
+            {
+                edges[y] += edges[x];
+                edges[x] = 0;
+                nodes[y] += nodes[x];
+                nodes[x] = 0;
+            }
+
+            // 返回根节点
+            int root(int x)
+            {
+                if (father[x] == x)
+                    return x;
+                state_merge(x, father[x]);
+                return father[x] = root(father[x]);
+            }
+
+            // 合并集合
+            void merge(int x, int y)
+            {
+                x = root(x);
+                y = root(y);
+                edges[x]++; // 新增边
+                if (x != y)
+                {
+                    state_merge(x, y);
+                    father[x] = y;
+                }
             }
         }
 
-        // 状态合并方程
-        void state_merge(int x, int y)
+        // 可持久化并查集. 时间: O(logn), 内存: O(n)
+        namespace persistent_dsu
         {
-            edges[y] += edges[x];
-            edges[x] = 0;
-            nodes[y] += nodes[x];
-            nodes[x] = 0;
+
         }
 
-        // 返回根节点
-        int root(int x)
+        // 树上启发式合并. 时间: O(nlogn), 内存: ?
+        namespace dsu_on_tree
         {
-            if (father[x] == x)
-                return x;
-            state_merge(x, father[x]);
-            return father[x] = root(father[x]);
+
         }
-
-        // 合并集合
-        void merge(int x, int y)
-        {
-            x = root(x);
-            y = root(y);
-            edges[x]++; // 新增边
-            if (x != y)
-            {
-                state_merge(x, y);
-                father[x] = y;
-            }
-        }
-
-        // 布尔型: 为集合根节点
-        inline bool is_father(int x) { return father[x] == x; }
-
-        // 布尔型: 同属同集合
-        inline bool is_merged(int x, int y) { return root(x) == root(y); }
-
-        // 返回集合点数
-        inline int count_nodes(int x) { return nodes[root(x)]; }
-
-        // 返回集合边数
-        inline int count_edges(int x) { return edges[root(x)]; }
-
-        // 布尔型: 节点属于一棵树
-        inline bool is_tree(int x) { return nodes[root(x)] > edges[root(x)]; }
     }
 
     // 模拟堆. 时间: O(qlogn), 内存: O(n)
@@ -2601,71 +2612,110 @@ namespace string_
 // 图论
 namespace graph
 {
-    // 广度优先搜索
+    // 广度优先搜索 - 以 最少转弯问题 为例
     namespace breadth_first_search
     {
-        const int MAX = 1005;
-
-        int n;
-        char map_[MAX][MAX];
-        int track[MAX][MAX];
-        struct XY
+        // 矩阵上广搜. 时间复杂度: O(sn^2) (s 为 next_ 数组大小)
+        namespace bfs_on_grid
         {
-            int x;
-            int y;
-            XY operator+(XY xy) { return {x + xy.x, y + xy.y}; }
-            XY operator*(int v) { return {x * v, y * v}; }
-            bool operator<(XY xy) const { return track[x][y] < track[xy.x][xy.y]; }
-            bool operator>(XY xy) const { return track[x][y] > track[xy.x][xy.y]; }
-            bool is_valid(XY xy) { return 0 <= x and x < n and 0 <= y and y < n and map_[x][y] != 'x' and (track[x][y] == -1 or track[x][y] > track[xy.x][xy.y]); }
-        } st, ed;
-        vector<XY> next_{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        queue<XY> que;
+            const int MAX = 1005;
 
-        void search(XY pos)
-        {
-            for (XY nxt : next_)
-                for (int i = 1; i < n; i++)
+            int n;
+            char map_[MAX][MAX];
+            int track[MAX][MAX];
+            struct XY
+            {
+                int x;
+                int y;
+                XY operator+(XY xy) { return {x + xy.x, y + xy.y}; }
+                XY operator*(int v) { return {x * v, y * v}; }
+                bool operator<(XY xy) const { return track[x][y] < track[xy.x][xy.y]; }
+                bool operator>(XY xy) const { return track[x][y] > track[xy.x][xy.y]; }
+                bool is_valid(XY xy) { return 0 <= x and x < n and 0 <= y and y < n and map_[x][y] != 'x' and (track[x][y] == -1 or track[x][y] > track[xy.x][xy.y]); }
+            } st, ed;
+            vector<XY> next_{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+            queue<XY> que;
+
+            void bfs(XY st, XY ed)
+            {
+                que.push(st);
+                for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
+                        track[i][j] = -1;
+                track[st.x][st.y] = 0;
+                while (not que.empty() and track[ed.x][ed.y] == -1)
                 {
-                    XY nw = pos + nxt * i;
-                    if (nw.is_valid(pos))
-                    {
-                        track[nw.x][nw.y] = track[pos.x][pos.y] + 1;
-                        que.push(nw);
-                    }
-                    else
-                        break;
+                    XY pos = que.front();
+                    que.pop();
+                    for (XY nxt : next_)
+                        for (int i = 1; i < n; i++)
+                        {
+                            XY nw = pos + nxt * i;
+                            if (nw.is_valid(pos))
+                            {
+                                track[nw.x][nw.y] = track[pos.x][pos.y] + 1;
+                                que.push(nw);
+                            }
+                            else
+                                break;
+                        }
                 }
-        }
+            }
 
-        void bfs()
-        {
-            que.push(st);
-            fill(track, track + n + 1, -1);
-            track[st.x][st.y] = 0;
-            while (not que.empty() and track[ed.x][ed.y] == -1)
+            void solve()
             {
-                XY pos = que.front();
-                que.pop();
-                search(pos);
+                cin >> n;
+                for (int i = 0; i < n; i++)
+                {
+                    cin >> map_[i];
+                    for (int j = 0; j < n; j++)
+                        if (map_[i][j] == 'A')
+                            st = {i, j};
+                        else if (map_[i][j] == 'B')
+                            ed = {i, j};
+                }
+                bfs(st, ed);
+                cout << track[ed.x][ed.y] << endl;
             }
         }
 
-        void solve()
+        // 图上广搜. 时间复杂度: O(m)
+        namespace bfs_on_graph
         {
-            cin >> n;
-            for (int i = 0; i < n; i++)
+            // 邻接表存图
+            const int MAX = 100005;
+            const int INF = 0x3f3f3f3f3f3f3f3fll;
+            vector<int> edge[MAX];
+            int dis[MAX];
+            bool vis[MAX];
+
+            void bfs(int st, int ed, int n)
             {
-                cin >> map_[i];
-                for (int j = 0; j < n; j++)
-                    if (map_[i][j] == 'A')
-                        st = {i, j};
-                    else if (map_[i][j] == 'B')
-                        ed = {i, j};
+                fill(dis, dis + n + 1, INF);
+                fill(vis, vis + n + 1, false);
+                queue<pair<int, int>> que;
+                dis[st] = 0;
+                que.push({0, st});
+                while (not que.empty() and not vis[ed])
+                {
+                    pair<int, int> p = que.front();
+                    int x = p.second, distance = p.first;
+                    que.pop();
+                    if (vis[x])
+                        continue;
+                    vis[x] = true;
+                    for (int y : edge[x])
+                    {
+                        if (dis[y] > distance + 1)
+                        {
+                            dis[y] = distance + 1;
+                            que.push({dis[y], y});
+                        }
+                    }
+                }
             }
-            bfs();
-            cout << track[ed.x][ed.y] << endl;
         }
+
     }
 
     // 拓扑排序. 复杂度: O(n)
@@ -2730,7 +2780,7 @@ namespace graph
             bool vis[MAX];
 
             // dijkstra 单源多点最短路径 正边 堆优化 O((n+m)log(n))
-            // 参数: st: 起点.
+            // 参数: st: 起点. n: 点数
             void dijkstra(int st, int n)
             {
                 fill(dis, dis + n + 1, INF);
@@ -2741,8 +2791,8 @@ namespace graph
                 while (not heap.empty())
                 {
                     pair<int, int> p = heap.top();
-                    heap.pop();
                     int x = p.second, distance = p.first;
+                    heap.pop();
                     if (vis[x])
                         continue;
                     vis[x] = true;
@@ -3456,7 +3506,7 @@ namespace sort_
     inline void merge_sort(int q[], int n) { __merge_sort(q, 0, n - 1); }
 }
 
-// 搜索算法
+// 二分查找
 namespace binary_search
 {
     // 二分查找, 返回任意索引, 否则返回-1.
@@ -3549,6 +3599,7 @@ namespace fast_io
     }
 
     // 超级读写
+    // @smallC
     // #define DEBUG 1  // 调试开关
     class IO
     {
