@@ -91,6 +91,11 @@ namespace stl
         }
     }
 
+    namespace string_
+    {
+
+    }
+
     namespace deque_
     {
         // 对比 vector
@@ -289,271 +294,512 @@ namespace stl
     }
 }
 
-// 高精度
-// !!!!!! 此高精度乘法与除法为朴素的高精度与高精度运算, 平方效率
-// Source: https://blog.csdn.net/xiji333/article/details/120812406
-class BigInteger
+// 类
+namespace collection_of_classes
 {
-private:
-    vector<int32_t> nums;    // 低位到高位存储
-    bool isPositive = 1;     // 符号位
-    int32_t length = 0;      // 位数
-    const int32_t digit = 8; // 存储元位数
-    const int32_t mod = 1e8;
-
-    size_t size() const { return nums.size(); }
-    void cutLeadZero()
+    // 高精度
+    // !!!!!! 此高精度乘法与除法为朴素的高精度与高精度运算, 平方效率
+    // Source: https://blog.csdn.net/xiji333/article/details/120812406
+    class BigInteger
     {
-        while (nums.size() > 1 && nums.back() == 0)
-            nums.pop_back();
-        if (nums.empty())
-            length = 0;
-        else
+    private:
+        vector<int32_t> nums;    // 低位到高位存储
+        bool isPositive = 1;     // 符号位
+        int32_t length = 0;      // 位数
+        const int32_t digit = 8; // 存储元位数
+        const int32_t mod = 1e8;
+
+        size_t size() const { return nums.size(); }
+        void cutLeadZero()
         {
-            length = (nums.size() - 1) * digit + to_string(nums.back()).size();
+            while (nums.size() > 1 && nums.back() == 0)
+                nums.pop_back();
+            if (nums.empty())
+                length = 0;
+            else
+            {
+                length = (nums.size() - 1) * digit + to_string(nums.back()).size();
+            }
         }
-    }
-    bool isZero() const { return nums.size() == 1 && nums.back() == 0; }
-    BigInteger absValue() const { return move(BigInteger(nums)); }
-    BigInteger e(size_t n) const
-    {
-        if (n <= 0)
-            return move(BigInteger(vector<int32_t>(1, 1)));
-        int32_t m = n / digit;
-        n -= m * digit;
-        vector<int32_t> ans(m);
-        string s = "1";
-        s += move(string(n, '0'));
-        ans.push_back(stoi(s));
-        return move(BigInteger(ans));
-    }
-
-public:
-    BigInteger(){};
-    BigInteger(const string &s)
-    {
-        int32_t n = s.size(), minIdx = 0;
-        if (s[0] == '-')
-            isPositive = false, minIdx = 1;
-        else if (s[0] == '+')
-            isPositive = true, minIdx = 1;
-        for (int32_t i = n - 1; i >= minIdx; i -= digit)
+        bool isZero() const { return nums.size() == 1 && nums.back() == 0; }
+        BigInteger absValue() const { return move(BigInteger(nums)); }
+        BigInteger e(size_t n) const
         {
-            int32_t beg = max(minIdx, i - digit + 1);
-            nums.push_back(stoi(s.substr(beg, i - beg + 1)));
+            if (n <= 0)
+                return move(BigInteger(vector<int32_t>(1, 1)));
+            int32_t m = n / digit;
+            n -= m * digit;
+            vector<int32_t> ans(m);
+            string s = "1";
+            s += move(string(n, '0'));
+            ans.push_back(stoi(s));
+            return move(BigInteger(ans));
         }
-        cutLeadZero();
-    }
-    BigInteger(int64_t a) : BigInteger(to_string(a)) {}
-    BigInteger(const BigInteger &bInt) : nums(bInt.nums), isPositive(bInt.isPositive), length(bInt.length) {}
-    BigInteger(BigInteger &&bInt) noexcept : nums(move(bInt.nums)), isPositive(bInt.isPositive), length(bInt.length) {}
-    BigInteger(const vector<int32_t> &vec, bool sign = true) : nums(vec), isPositive(sign) { cutLeadZero(); }
 
-    friend istream &operator>>(istream &is, BigInteger &bInt)
-    {
-        string s;
-        is >> s;
-        bInt = move(BigInteger(s));
-        return is;
-    }
-    friend ostream &operator<<(ostream &os, const BigInteger &bInt)
-    {
-        os << (string)bInt;
-        return os;
-    }
-
-    operator string() const
-    {
-        string ans;
-        if (!isPositive)
-            ans += "-";
-        int32_t n = nums.size();
-        for (int32_t i = n - 1; i >= 0; i--)
+    public:
+        BigInteger(){};
+        BigInteger(const string &s)
         {
-            string s = to_string(nums[i]);
-            if (i != n - 1)
-                ans += string(digit - s.size(), '0');
-            ans += s;
+            int32_t n = s.size(), minIdx = 0;
+            if (s[0] == '-')
+                isPositive = false, minIdx = 1;
+            else if (s[0] == '+')
+                isPositive = true, minIdx = 1;
+            for (int32_t i = n - 1; i >= minIdx; i -= digit)
+            {
+                int32_t beg = max(minIdx, i - digit + 1);
+                nums.push_back(stoi(s.substr(beg, i - beg + 1)));
+            }
+            cutLeadZero();
         }
-        return ans;
-    }
+        BigInteger(int64_t a) : BigInteger(to_string(a)) {}
+        BigInteger(const BigInteger &bInt) : nums(bInt.nums), isPositive(bInt.isPositive), length(bInt.length) {}
+        BigInteger(BigInteger &&bInt) noexcept : nums(move(bInt.nums)), isPositive(bInt.isPositive), length(bInt.length) {}
+        BigInteger(const vector<int32_t> &vec, bool sign = true) : nums(vec), isPositive(sign) { cutLeadZero(); }
 
-    BigInteger operator+() const { return *this; }
-    BigInteger operator-() const
-    {
-        BigInteger tmp(*this);
-        if (!tmp.isZero())
-            tmp.isPositive = !isPositive;
-        return tmp;
-    }
+        friend istream &operator>>(istream &is, BigInteger &bInt)
+        {
+            string s;
+            is >> s;
+            bInt = move(BigInteger(s));
+            return is;
+        }
+        friend ostream &operator<<(ostream &os, const BigInteger &bInt)
+        {
+            os << (string)bInt;
+            return os;
+        }
 
-    bool operator<(const BigInteger &bInt) const
-    {
-        if (isPositive && !bInt.isPositive)
-            return false;
-        if (!isPositive && bInt.isPositive)
-            return true;
-        bool flag = true;
-        if (!isPositive)
-            flag = false; // 都为负数
-        if (length < bInt.length)
-            return flag;
-        else if (length > bInt.length)
-            return !flag;
-        int32_t n = size();
-        for (int32_t i = n - 1; i >= 0; i--)
+        operator string() const
         {
-            if (nums[i] < bInt[i])
-                return flag;
-            else if (nums[i] > bInt[i])
-                return !flag;
+            string ans;
+            if (!isPositive)
+                ans += "-";
+            int32_t n = nums.size();
+            for (int32_t i = n - 1; i >= 0; i--)
+            {
+                string s = to_string(nums[i]);
+                if (i != n - 1)
+                    ans += string(digit - s.size(), '0');
+                ans += s;
+            }
+            return ans;
         }
-        return false;
-    }
-    bool operator<=(const BigInteger &bInt) const
-    {
-        if (isPositive && !bInt.isPositive)
-            return false;
-        if (!isPositive && bInt.isPositive)
-            return true;
-        bool flag = true;
-        if (!isPositive)
-            flag = false; // 都为负数
-        if (length < bInt.length)
-            return flag;
-        else if (length > bInt.length)
-            return !flag;
-        int32_t n = size();
-        for (int32_t i = n - 1; i >= 0; i--)
+
+        BigInteger operator+() const { return *this; }
+        BigInteger operator-() const
         {
-            if (nums[i] < bInt[i])
-                return flag;
-            else if (nums[i] > bInt[i])
-                return !flag;
+            BigInteger tmp(*this);
+            if (!tmp.isZero())
+                tmp.isPositive = !isPositive;
+            return tmp;
         }
-        return true;
-    }
-    bool operator==(const BigInteger &bInt) const
-    {
-        if (length != bInt.length)
-            return false;
-        int32_t n = size();
-        for (int32_t i = 0; i < n; i++)
-            if (nums[i] != bInt[i])
+
+        bool operator<(const BigInteger &bInt) const
+        {
+            if (isPositive && !bInt.isPositive)
                 return false;
-        return true;
-    }
-
-    BigInteger operator+(const BigInteger &bInt) const
-    {
-        if (!bInt.isPositive)
-            return *this - (-bInt); // 加上负数 = 减去其绝对值
-        if (!isPositive)
-            return bInt - (-*this); // 负数+正数 = 整数-(-负数)
-        // 要么都正 要么都负
-        vector<int32_t> ans;
-        int32_t n = size(), m = bInt.size(), sum = 0, i = 0, j = 0;
-        while (i < n || j < m || sum)
-        {
-            if (i < n)
-                sum += nums[i++];
-            if (j < m)
-                sum += bInt[j++];
-            ans.push_back(sum % mod);
-            sum /= mod;
-        }
-        return move(BigInteger(ans, isPositive));
-    }
-    BigInteger operator-(const BigInteger &bInt) const
-    {
-        if (!bInt.isPositive)
-            return *this + (-bInt); // 减去负数 = 加上其绝对值
-        if (!isPositive)
-            return -((-*this) + bInt); // 负数-正数 = -(-负数 + 正数)
-        if (*this < bInt)
-            return -(bInt - *this);
-        // 只计算大数减去小数
-        vector<int32_t> ans;
-        int32_t i = 0, j = 0, n = size(), m = bInt.size(), sum = 0;
-        while (i < n || j < m || sum)
-        {
-            if (i < n)
-                sum += nums[i++];
-            if (j < m)
-                sum -= bInt[j++];
-            int32_t flag = 0;
-            if (sum < 0)
+            if (!isPositive && bInt.isPositive)
+                return true;
+            bool flag = true;
+            if (!isPositive)
+                flag = false; // 都为负数
+            if (length < bInt.length)
+                return flag;
+            else if (length > bInt.length)
+                return !flag;
+            int32_t n = size();
+            for (int32_t i = n - 1; i >= 0; i--)
             {
-                flag = -1;
-                sum += mod;
+                if (nums[i] < bInt[i])
+                    return flag;
+                else if (nums[i] > bInt[i])
+                    return !flag;
             }
-            ans.push_back(sum);
-            sum = flag;
+            return false;
         }
-        return move(BigInteger(ans));
-    }
-    BigInteger operator*(const BigInteger &bInt) const
-    {
-        int32_t n = size(), m = bInt.size();
-        vector<int32_t> ans(n + m);
-        using int64_t = long long;
-        for (int32_t i = 0; i < n; i++)
+        bool operator<=(const BigInteger &bInt) const
         {
-            for (int32_t j = 0; j < m; j++)
+            if (isPositive && !bInt.isPositive)
+                return false;
+            if (!isPositive && bInt.isPositive)
+                return true;
+            bool flag = true;
+            if (!isPositive)
+                flag = false; // 都为负数
+            if (length < bInt.length)
+                return flag;
+            else if (length > bInt.length)
+                return !flag;
+            int32_t n = size();
+            for (int32_t i = n - 1; i >= 0; i--)
             {
-                int64_t tmp = ans[i + j] + nums[i] * 1ll * bInt[j];
-                ans[i + j] = tmp % mod;
-                ans[i + j + 1] += tmp / mod;
+                if (nums[i] < bInt[i])
+                    return flag;
+                else if (nums[i] > bInt[i])
+                    return !flag;
             }
+            return true;
         }
-        return move(BigInteger(ans, isPositive == bInt.isPositive));
-    }
-    pair<BigInteger, BigInteger> operator/(const BigInteger &bInt) const
-    {
-        BigInteger a = absValue();
-        BigInteger b = bInt.absValue();
-        if (b.isZero())
-            return pair<BigInteger, BigInteger>(*this, move(b));
-        if (a < b)
-            return pair<BigInteger, BigInteger>(move(BigInteger(0)), *this);
-        int32_t len = a.length - b.length + 1;
-        string ans;
-        if (isPositive != bInt.isPositive)
-            ans = "-";
-        for (int32_t i = 0; i < len; i++)
+        bool operator==(const BigInteger &bInt) const
         {
-            BigInteger tmp = e(len - i - 1) * b;
-            int32_t times = 0;
-            while (tmp <= a)
-            {
-                a = a - tmp;
-                ++times;
-            }
-            ans += times + '0';
+            if (length != bInt.length)
+                return false;
+            int32_t n = size();
+            for (int32_t i = 0; i < n; i++)
+                if (nums[i] != bInt[i])
+                    return false;
+            return true;
         }
-        a.isPositive = isPositive;
-        return pair<BigInteger, BigInteger>(move(BigInteger(ans)), move(a));
-    }
 
-    int32_t operator[](int32_t idx) const { return nums[idx]; }
+        BigInteger operator+(const BigInteger &bInt) const
+        {
+            if (!bInt.isPositive)
+                return *this - (-bInt); // 加上负数 = 减去其绝对值
+            if (!isPositive)
+                return bInt - (-*this); // 负数+正数 = 整数-(-负数)
+            // 要么都正 要么都负
+            vector<int32_t> ans;
+            int32_t n = size(), m = bInt.size(), sum = 0, i = 0, j = 0;
+            while (i < n || j < m || sum)
+            {
+                if (i < n)
+                    sum += nums[i++];
+                if (j < m)
+                    sum += bInt[j++];
+                ans.push_back(sum % mod);
+                sum /= mod;
+            }
+            return move(BigInteger(ans, isPositive));
+        }
+        BigInteger operator-(const BigInteger &bInt) const
+        {
+            if (!bInt.isPositive)
+                return *this + (-bInt); // 减去负数 = 加上其绝对值
+            if (!isPositive)
+                return -((-*this) + bInt); // 负数-正数 = -(-负数 + 正数)
+            if (*this < bInt)
+                return -(bInt - *this);
+            // 只计算大数减去小数
+            vector<int32_t> ans;
+            int32_t i = 0, j = 0, n = size(), m = bInt.size(), sum = 0;
+            while (i < n || j < m || sum)
+            {
+                if (i < n)
+                    sum += nums[i++];
+                if (j < m)
+                    sum -= bInt[j++];
+                int32_t flag = 0;
+                if (sum < 0)
+                {
+                    flag = -1;
+                    sum += mod;
+                }
+                ans.push_back(sum);
+                sum = flag;
+            }
+            return move(BigInteger(ans));
+        }
+        BigInteger operator*(const BigInteger &bInt) const
+        {
+            int32_t n = size(), m = bInt.size();
+            vector<int32_t> ans(n + m);
+            using int64_t = long long;
+            for (int32_t i = 0; i < n; i++)
+            {
+                for (int32_t j = 0; j < m; j++)
+                {
+                    int64_t tmp = ans[i + j] + nums[i] * 1ll * bInt[j];
+                    ans[i + j] = tmp % mod;
+                    ans[i + j + 1] += tmp / mod;
+                }
+            }
+            return move(BigInteger(ans, isPositive == bInt.isPositive));
+        }
+        pair<BigInteger, BigInteger> operator/(const BigInteger &bInt) const
+        {
+            BigInteger a = absValue();
+            BigInteger b = bInt.absValue();
+            if (b.isZero())
+                return pair<BigInteger, BigInteger>(*this, move(b));
+            if (a < b)
+                return pair<BigInteger, BigInteger>(move(BigInteger(0)), *this);
+            int32_t len = a.length - b.length + 1;
+            string ans;
+            if (isPositive != bInt.isPositive)
+                ans = "-";
+            for (int32_t i = 0; i < len; i++)
+            {
+                BigInteger tmp = e(len - i - 1) * b;
+                int32_t times = 0;
+                while (tmp <= a)
+                {
+                    a = a - tmp;
+                    ++times;
+                }
+                ans += times + '0';
+            }
+            a.isPositive = isPositive;
+            return pair<BigInteger, BigInteger>(move(BigInteger(ans)), move(a));
+        }
 
-    BigInteger &operator=(const BigInteger &bInt)
-    {
-        if (bInt == *this)
+        int32_t operator[](int32_t idx) const { return nums[idx]; }
+
+        BigInteger &operator=(const BigInteger &bInt)
+        {
+            if (bInt == *this)
+                return *this;
+            nums = bInt.nums;
+            isPositive = bInt.isPositive;
+            length = bInt.length;
             return *this;
-        nums = bInt.nums;
-        isPositive = bInt.isPositive;
-        length = bInt.length;
-        return *this;
-    }
-    BigInteger &operator=(BigInteger &&bInt) noexcept
+        }
+        BigInteger &operator=(BigInteger &&bInt) noexcept
+        {
+            nums = move(bInt.nums);
+            isPositive = bInt.isPositive;
+            length = bInt.length;
+            return *this;
+        }
+    };
+
+    // 分数类
+    // !!!!!! 此分数请确保分子分母始终不超过 1e9
+    class Frac
     {
-        nums = move(bInt.nums);
-        isPositive = bInt.isPositive;
-        length = bInt.length;
-        return *this;
+    public:
+        int x, y;
+        Frac() { x = 0, y = 1; }
+        Frac(int a) { x = a, y = 1; }
+        Frac(int a, int b) { b > 0 ? (x = a, y = b) : (x = -a, y = -b); }
+        Frac shrink(Frac a)
+        {
+            int g = __gcd(a.x, a.y);
+            return Frac(a.x / g, a.y / g);
+        }
+        Frac operator-() { return Frac(-x, y); }
+        Frac operator+(Frac a) { return shrink(Frac(x * a.y + a.x * y, y * a.y)); }
+        Frac operator-(Frac a) { return shrink(Frac(x * a.y - a.x * y, y * a.y)); }
+        Frac operator*(Frac a) { return shrink(Frac(x * a.x, y * a.y)); }
+        Frac operator/(Frac a) { return shrink(Frac(a.x / abs(a.x) * x * a.y, y * abs(a.x))); }
+        bool operator<(Frac a) { return x * a.y < y * a.x; }
+        bool operator>(Frac a) { return x * a.y > y * a.x; }
+        bool operator==(Frac a) { return x * a.y == y * a.x; }
+    };
+
+    // 取模类
+    // Source: Namomo
+    namespace ModInt
+    {
+        const int MOD = 1e9 + 7;
+        template <long long P>
+        class ModInt
+        {
+        public:
+            ModInt() : _v(0) {}
+            template <typename T>
+            ModInt(T v) { _v = ((long long)v % P + P) % P; }
+            long long val() const { return _v; }
+            ModInt &operator++()
+            {
+                ++_v;
+                if (_v == P)
+                    _v = 0;
+                return *this;
+            }
+            ModInt &operator--()
+            {
+                if (_v == 0)
+                    _v = P;
+                --_v;
+                return *this;
+            }
+            ModInt operator++()
+            {
+                ModInt oldVal = *this;
+                ++*this;
+                return oldVal;
+            }
+            ModInt operator--()
+            {
+                ModInt oldVal = *this;
+                --*this;
+                return oldVal;
+            }
+            ModInt &operator+=(const ModInt &rhs)
+            {
+                _v += rhs._v;
+                _v %= P;
+                return *this;
+            }
+            ModInt &operator-=(const ModInt &rhs)
+            {
+                _v -= rhs._v;
+                _v = (_v + P) % P;
+                return *this;
+            }
+            ModInt &operator*=(const ModInt &rhs)
+            {
+                _v *= rhs._v;
+                _v %= P;
+                return *this;
+            }
+            ModInt &operator/=(const ModInt &rhs) { return *this = *this * rhs.inv(); }
+            ModInt operator+() const { return *this; }
+            ModInt operator-() const { return ModInt() - *this; }
+            ModInt pow(long long exp) const
+            {
+                // assert(exp>=0);
+                ModInt res = 1;
+                ModInt base = *this;
+                while (exp)
+                {
+                    if (exp & 1)
+                        res *= base;
+                    base *= base;
+                    exp >>= 1;
+                }
+                return res;
+            }
+            ModInt inv() const
+            {
+                // assert(_v);
+                return pow(P - 2);
+            }
+            friend ModInt operator+(const ModInt &lhs, const ModInt &rhs)
+            {
+                ModInt res = lhs;
+                res += rhs;
+                return res;
+            }
+            friend ModInt operator-(const ModInt &lhs, const ModInt &rhs)
+            {
+                ModInt res = lhs;
+                res -= rhs;
+                return res;
+            }
+            friend ModInt operator*(const ModInt &lhs, const ModInt &rhs)
+            {
+                ModInt res = lhs;
+                res *= rhs;
+                return res;
+            }
+            friend ModInt operator/(const ModInt &lhs, const ModInt &rhs)
+            {
+                ModInt res = lhs;
+                res /= rhs;
+                return res;
+            }
+            friend bool operator==(const ModInt &lhs, const ModInt &rhs) { return lhs._v == rhs._v; }
+            friend bool operator!=(const ModInt &lhs, const ModInt &rhs) { return lhs._v != rhs._v; }
+            friend std::istream &operator>>(std::istream &is, ModInt &aim)
+            {
+                long long tmp;
+                is >> tmp;
+                aim = ModInt(tmp);
+                return is;
+            }
+            friend std::ostream &operator<<(std::ostream &os, const ModInt &aim) { return os << aim.val(); }
+
+        private:
+            long long _v;
+        };
+        using mint = ModInt<MOD>;
     }
-};
+    
+    // 计算几何
+    // 凸包请见下链接
+    // Source: https://zhuanlan.zhihu.com/p/540420439
+    namespace geometry
+    {
+        const double EPS = -1e12;
+        const double PI = acos(-1.0);
+        // 弧度制
+        class Vec
+        {
+        public:
+            double x, y;
+            Vec() { x = 0, y = 0; }
+            Vec(double a, double b) { x = a, y = b; }
+            friend istream &operator>>(istream &cin, Vec &a) { return cin >> a.x >> a.y; }
+            friend ostream &operator<<(ostream &cout, Vec a) { return cout << a.x << ' ' << a.y; }
+            Vec operator-() { return Vec(-x, -y); }
+            Vec operator+(Vec a) { return Vec(x + a.x, y + a.y); }
+            Vec operator-(Vec a) { return Vec(x - a.x, y - a.y); }
+            Vec operator*(double a) { return Vec(x * a, y * a); }
+            Vec operator/(double a) { return Vec(x / a, y / a); }
+            friend Vec operator*(double a, Vec b) { return Vec(b.x * a, b.y * a); }
+            friend Vec operator/(double a, Vec b) { return Vec(b.x / a, b.y / a); }
+            Vec operator+=(Vec a) { return Vec(x += a.x, y += a.y); }
+            Vec operator-=(Vec a) { return Vec(x -= a.x, y -= a.y); }
+            Vec operator*=(double a) { return Vec(x *= a, y *= a); }
+            Vec operator/=(double a) { return Vec(x /= a, y /= a); }
+            double operator*(Vec a) { return x * a.x + y * a.y; } // 点积
+            double operator^(Vec a) { return x * a.y - y * a.x; } // 叉积
+            bool operator<(Vec a)
+            {
+                if (y == 0 and a.y == 0)
+                    if (x * a.x >= 0)
+                        return abs(x) < abs(a.x);
+                    else
+                        return x > 0;
+                if (y >= 0 and a.y < 0)
+                    return true;
+                if (y < 0 and a.y >= 0)
+                    return false;
+                if ((*this ^ a) > 0)
+                    return true;
+                else if ((*this ^ a) == 0)
+                    return abs(x) < abs(a.x);
+                else
+                    return false;
+            }
+            bool operator>(Vec a)
+            {
+                if (y == 0 and a.y == 0)
+                    if (x * a.x >= 0)
+                        return abs(x) > abs(a.x);
+                    else
+                        return x < 0;
+                if (y < 0 and a.y >= 0)
+                    return true;
+                if (y >= 0 and a.y < 0)
+                    return false;
+                if ((*this ^ a) < 0)
+                    return true;
+                else if ((*this ^ a) == 0)
+                    return abs(x) > abs(a.x);
+                else
+                    return false;
+            }
+            bool operator==(Vec a) { return x == a.x and y == a.y; }
+        };
+
+        bool is_nan(Vec a) { return isnan(a.x) or isnan(a.y); }
+        double len2(Vec a) { return a.x * a.x + a.y * a.y; }
+        double len(Vec a) { return sqrt(a.x * a.x + a.y * a.y); }
+        Vec unit(Vec a) { return a / len(a); }
+        Vec turn90(Vec a) { return Vec(-a.y, a.x); }                                                                  // 逆时针旋转 90 度
+        Vec turn(Vec a, double rad) { return Vec(a.x * cos(rad) - a.y * sin(rad), a.y * cos(rad) + a.x * sin(rad)); } // 逆时针旋转
+        double angle(Vec a, Vec b) { return a * b / len(a) / len(b); }                                                // cos 夹角
+        double height(Vec a, Vec b1, Vec b2) { return fabs((b1 - a) ^ (b2 - a)) / len(b1 - b2); }                     // 点线距离
+
+        // 直线交点
+        Vec line_cross(Vec a1, Vec a2, Vec b1, Vec b2)
+        {
+            a2 -= a1;
+            b2 -= b1;
+            return b2 ^ a2 ? a1 + (b2 ^ (b1 - a1)) / (b2 ^ a2) * a2 : Vec(NAN, NAN);
+        }
+
+        // 线段交点
+        Vec segment_cross(Vec &a1, Vec &a2, Vec &b1, Vec &b2)
+        {
+            Vec c = line_cross(a1, a2, b1, b2);
+            return (a1 - c) * (a2 - c) > 0 or (b1 - c) * (b2 - c) > 0 ? Vec(NAN, NAN) : c;
+        }
+    }
+}
 
 // 数学算法
 namespace math
@@ -3374,7 +3620,7 @@ namespace graph
 
         int lg2[MAX];
         vector<int> edge[MAX];
-        int depth[MAX];  // 根深为 0
+        int depth[MAX]; // 根深为 0
         int st[MAX][LOG];
 
         // 预处理对数
@@ -3397,10 +3643,13 @@ namespace graph
                     build(y, x, level + 1);
         }
 
-        // 查询 x 的 p 级祖先, 不存在返回 -1
-        int ancestor(int x, int p) {
-            if (p > depth[x]) return -1;
-            while(p) {
+        // 查询多级祖先, 不存在返回 -1
+        int ancestor(int x, int p)
+        {
+            if (p > depth[x])
+                return -1;
+            while (p)
+            {
                 int step = lg2[p];
                 x = st[x][step];
                 p -= 1 << step;
@@ -3408,7 +3657,7 @@ namespace graph
             return x;
         }
 
-        // 查询
+        // 查询最近公共祖先
         int lca(int x, int y)
         {
             if (depth[x] < depth[y])
@@ -3428,7 +3677,8 @@ namespace graph
     }
 
     // 树上启发式合并. 以 树上颜色合并 为例
-    namespace dsu_on_tree {
+    namespace dsu_on_tree
+    {
         const int MAX = 100005;
 
         int n;
@@ -3440,13 +3690,17 @@ namespace graph
         int res[MAX];
 
         // 标记重链
-        int dfs(int x, int pre) {
+        int dfs(int x, int pre)
+        {
             int cnt = 1;
             int ymax = 0, max_ = 0;
-            for (int y : edge[x]) {
-                if (y == pre) continue;
+            for (int y : edge[x])
+            {
+                if (y == pre)
+                    continue;
                 int tmp = dfs(y, x);
-                if (max_ < tmp) {
+                if (max_ < tmp)
+                {
                     max_ = tmp;
                     ymax = y;
                 }
@@ -3456,33 +3710,40 @@ namespace graph
             return cnt;
         }
 
-        // 计算贡献
-        void calc(int x, int pre, int heavy_son, int val) {
-            for (int y : edge[x]) {
-                if (y == pre or y == heavy_son) continue;
+        // 计算贡献  // Attention
+        void calc(int x, int pre, int heavy_son, int val)
+        {
+            for (int y : edge[x])
+            {
+                if (y == pre or y == heavy_son)
+                    continue;
                 calc(y, x, heavy_son, val);
             }
             cnt[color[x]] += val;
-            if (cnt[color[x]] == max_) {
+            if (cnt[color[x]] == max_)
                 cc += color[x];
-            } else if (cnt[color[x]] > max_) {
+            else if (cnt[color[x]] > max_)
+            {
                 max_ = cnt[color[x]];
                 cc = color[x];
             }
         }
 
         // 树上启发式合并
-        void dsu(int x, int pre, bool keep) {
-            for (int y : edge[x]) {
-                if (y == pre or y == heavy[x]) continue;
+        void dsu(int x, int pre, bool keep)
+        {
+            for (int y : edge[x])
+            {
+                if (y == pre or y == heavy[x])
+                    continue;
                 dsu(y, x, false);
             }
-            if (heavy[x]) {
+            if (heavy[x])
                 dsu(heavy[x], x, true);
-            }
             calc(x, pre, heavy[x], 1);
             res[x] = cc;
-            if (not keep) {
+            if (not keep)
+            {
                 calc(x, pre, 0, -1);
                 max_ = 0;
                 cc = 0;
