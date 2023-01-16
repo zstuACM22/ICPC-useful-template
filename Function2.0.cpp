@@ -569,22 +569,47 @@ namespace collection_of_classes
     {
     public:
         int x, y;
-        Frac() { x = 0, y = 1; }
-        Frac(int a) { x = a, y = 1; }
-        Frac(int a, int b) { b > 0 ? (x = a, y = b) : (x = -a, y = -b); }
-        Frac shrink(Frac a)
+        short sign = 1;
+        bool is_nan = false, is_inf = false;
+        Frac(int a = 0, int b = 1)
+        {
+            if (b >= 0)
+                x = a, y = b;
+            else
+                x = -a, y = -b;
+            if (x < 0)
+                sign = -1, x = -x;
+            if (x == 0 and y == 0)
+                is_nan = true;
+            if (y == 0)
+                is_inf = true;
+            *this = shrink(*this);
+        }
+        friend Frac shrink(Frac a)
         {
             int g = __gcd(a.x, a.y);
-            return Frac(a.x / g, a.y / g);
+            return g > 1 ? Frac(a.x / g, a.y / g) : a;
         }
-        Frac operator-() { return Frac(-x, y); }
-        Frac operator+(Frac a) { return shrink(Frac(x * a.y + a.x * y, y * a.y)); }
-        Frac operator-(Frac a) { return shrink(Frac(x * a.y - a.x * y, y * a.y)); }
-        Frac operator*(Frac a) { return shrink(Frac(x * a.x, y * a.y)); }
-        Frac operator/(Frac a) { return shrink(Frac(a.x / abs(a.x) * x * a.y, y * abs(a.x))); }
-        bool operator<(Frac a) { return x * a.y < y * a.x; }
-        bool operator>(Frac a) { return x * a.y > y * a.x; }
-        bool operator==(Frac a) { return x * a.y == y * a.x; }
+        friend Frac operator-(Frac a)
+        {
+            Frac res = a;
+            res.sign = -a.sign;
+            return res;
+        }
+        friend Frac operator+(Frac a, Frac b) { return shrink(Frac(a.sign * a.x * b.y + b.sign * b.x * a.y, a.y * b.y)); }
+        friend Frac operator-(Frac a, Frac b) { return shrink(Frac(a.sign * a.x * b.y - b.sign * b.x * a.y, a.y * b.y)); }
+        friend Frac operator*(Frac a, Frac b) { return shrink(Frac(a.sign * a.x * b.sign * b.x, a.y * b.y)); }
+        friend Frac operator/(Frac a, Frac b) { return shrink(Frac(a.sign * a.x * b.sign * b.y, a.y * b.x)); }
+        friend bool operator<(Frac a, Frac b) { return a.sign * a.x * b.y < b.sign * a.y * b.x; }
+        friend bool operator>(Frac a, Frac b) { return a.sign * a.x * b.y > b.sign * a.y * b.x; }
+        friend bool operator==(Frac a, Frac b)
+        {
+            if (a.is_nan or b.is_nan)
+                return false;
+            return a.sign * a.x * b.y == b.sign * a.y * b.x;
+        }
+        friend bool operator!=(Frac a, Frac b) { return a.sign * a.x * b.y != b.sign * a.y * b.x; }
+        Frac len() { Frac(x, y); }
     };
 
     // 取模类
@@ -706,7 +731,7 @@ namespace collection_of_classes
         };
         using mint = ModInt<MOD>;
     }
-    
+
     // 计算几何
     // 凸包请见下链接
     // Source: https://zhuanlan.zhihu.com/p/540420439
@@ -714,10 +739,9 @@ namespace collection_of_classes
     {
         const double EPS = -1e12;
         const double PI = acos(-1.0);
-        // 弧度制
-        class Vec
+        // 角度用弧度制
+        struct Vec
         {
-        public:
             double x, y;
             Vec() { x = 0, y = 0; }
             Vec(double a, double b) { x = a, y = b; }
@@ -740,7 +764,7 @@ namespace collection_of_classes
             {
                 if (y == 0 and a.y == 0)
                     if (x * a.x >= 0)
-                        return abs(x) < abs(a.x);
+                        return fabs(x) < fabs(a.x);
                     else
                         return x > 0;
                 if (y >= 0 and a.y < 0)
@@ -750,7 +774,7 @@ namespace collection_of_classes
                 if ((*this ^ a) > 0)
                     return true;
                 else if ((*this ^ a) == 0)
-                    return abs(x) < abs(a.x);
+                    return fabs(x) < fabs(a.x);
                 else
                     return false;
             }
@@ -758,7 +782,7 @@ namespace collection_of_classes
             {
                 if (y == 0 and a.y == 0)
                     if (x * a.x >= 0)
-                        return abs(x) > abs(a.x);
+                        return fabs(x) > fabs(a.x);
                     else
                         return x < 0;
                 if (y < 0 and a.y >= 0)
@@ -768,7 +792,7 @@ namespace collection_of_classes
                 if ((*this ^ a) < 0)
                     return true;
                 else if ((*this ^ a) == 0)
-                    return abs(x) > abs(a.x);
+                    return fabs(x) > fabs(a.x);
                 else
                     return false;
             }
@@ -776,13 +800,25 @@ namespace collection_of_classes
         };
 
         bool is_nan(Vec a) { return isnan(a.x) or isnan(a.y); }
-        double len2(Vec a) { return a.x * a.x + a.y * a.y; }
-        double len(Vec a) { return sqrt(a.x * a.x + a.y * a.y); }
-        Vec unit(Vec a) { return a / len(a); }
+        double abs2(Vec a) { return a.x * a.x + a.y * a.y; }
+        double abs(Vec a) { return sqrt(a.x * a.x + a.y * a.y); }
+        Vec unit(Vec a) { return a / abs(a); }
         Vec turn90(Vec a) { return Vec(-a.y, a.x); }                                                                  // 逆时针旋转 90 度
         Vec turn(Vec a, double rad) { return Vec(a.x * cos(rad) - a.y * sin(rad), a.y * cos(rad) + a.x * sin(rad)); } // 逆时针旋转
-        double angle(Vec a, Vec b) { return a * b / len(a) / len(b); }                                                // cos 夹角
-        double height(Vec a, Vec b1, Vec b2) { return fabs((b1 - a) ^ (b2 - a)) / len(b1 - b2); }                     // 点线距离
+        double height(Vec a, Vec b1, Vec b2) { return fabs((b1 - a) ^ (b2 - a)) / abs(b1 - b2); }                     // 点线距离
+
+        // cos 夹角
+        double angle_cos(Vec a, Vec b)
+        {
+            return a * b / abs(a) / abs(b);
+        }
+
+        // tan 夹角
+        double angle_tan(Vec a, Vec b)
+        {
+            double f = fabs((a.x * b.y - b.x * a.y) / (a.x * b.x + a.y * b.y));
+            return angle_cos(a, b) >= 0 ? f : -f;
+        }
 
         // 直线交点
         Vec line_cross(Vec a1, Vec a2, Vec b1, Vec b2)
@@ -793,11 +829,12 @@ namespace collection_of_classes
         }
 
         // 线段交点
-        Vec segment_cross(Vec &a1, Vec &a2, Vec &b1, Vec &b2)
+        Vec segment_cross(Vec a1, Vec a2, Vec b1, Vec b2)
         {
             Vec c = line_cross(a1, a2, b1, b2);
             return (a1 - c) * (a2 - c) > 0 or (b1 - c) * (b2 - c) > 0 ? Vec(NAN, NAN) : c;
         }
+
     }
 }
 
