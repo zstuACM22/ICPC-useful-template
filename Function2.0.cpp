@@ -4,25 +4,66 @@
 #include <bits/stdc++.h>
 #define int int64_t
 #define endl '\n'
-#pragma GCC optimize(2)
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 遇到以下问题, 请给自己两个巴掌:
-// 1. 多组输入全局数组没有清干净. 可能是存边的 vector, 计数的 map, 可能是数组.
-// 2. 是不是又忘改 MAX 参数了.
-// 3. for (int i = n; i > 0; i++).
+// 火车头优化
+namespace optimize
+{
+// 实测优化 <1% 相较于 #pragma GCC optimize(3, "Ofast", "inline")
+#pragma GCC optimize(3)
+#pragma GCC target("avx,sse2,sse3,sse4,mmx")
+#pragma GCC optimize("Ofast")
+#pragma GCC optimize("inline")
+#pragma GCC optimize("-fgcse")
+#pragma GCC optimize("-fgcse-lm")
+#pragma GCC optimize("-fipa-sra")
+#pragma GCC optimize("-ftree-pre")
+#pragma GCC optimize("-ftree-vrp")
+#pragma GCC optimize("-fpeephole2")
+#pragma GCC optimize("-ffast-math")
+#pragma GCC optimize("-fsched-spec")
+#pragma GCC optimize("unroll-loops")
+#pragma GCC optimize("-falign-jumps")
+#pragma GCC optimize("-falign-loops")
+#pragma GCC optimize("-falign-labels")
+#pragma GCC optimize("-fdevirtualize")
+#pragma GCC optimize("-fcaller-saves")
+#pragma GCC optimize("-fcrossjumping")
+#pragma GCC optimize("-fthread-jumps")
+#pragma GCC optimize("-funroll-loops")
+#pragma GCC optimize("-fwhole-program")
+#pragma GCC optimize("-freorder-blocks")
+#pragma GCC optimize("-fschedule-insns")
+#pragma GCC optimize("inline-functions")
+#pragma GCC optimize("-ftree-tail-merge")
+#pragma GCC optimize("-fschedule-insns2")
+#pragma GCC optimize("-fstrict-aliasing")
+#pragma GCC optimize("-fstrict-overflow")
+#pragma GCC optimize("-falign-functions")
+#pragma GCC optimize("-fcse-skip-blocks")
+#pragma GCC optimize("-fcse-follow-jumps")
+#pragma GCC optimize("-fsched-interblock")
+#pragma GCC optimize("-fpartial-inlining")
+#pragma GCC optimize("no-stack-protector")
+#pragma GCC optimize("-freorder-functions")
+#pragma GCC optimize("-findirect-inlining")
+#pragma GCC optimize("-fhoist-adjacent-loads")
+#pragma GCC optimize("-frerun-cse-after-loop")
+#pragma GCC optimize("inline-small-functions")
+#pragma GCC optimize("-finline-small-functions")
+#pragma GCC optimize("-ftree-switch-conversion")
+#pragma GCC optimize("-foptimize-sibling-calls")
+#pragma GCC optimize("-fexpensive-optimizations")
+#pragma GCC optimize("-funsafe-loop-optimizations")
+#pragma GCC optimize("inline-functions-called-once")
+#pragma GCC optimize("-fdelete-null-pointer-checks")
+}
 
 // 乱七八糟
 namespace l78z
 {
-    // 1 的 一阶前缀和: n
-    // 1 的 二阶前缀和: n * (n + 1) / 2
-    // 1 的 三阶前缀和: n * (n + 1) * (n + 2) / 6
-    // 1 的 k 阶前缀和: C(n + k - 1, k) = fac[n + k - 1] * inv[k] % MOD * inv[n - 1] % MOD
-    // n 的 一阶前缀和: n * (n + 1) / 2
-    // n^2 的 一阶前缀和: n * (n + 1) * (2 * n + 1) / 6
-    // n^3 的 一阶前缀和: n * n * (n + 1) * (n + 1) / 4
+    // 常见质数: 998244353, 1000000007, 1000000009
     // pi = M_PI = acos(-1)
     // e  = M_E  = exp(1)
     double log(double x);             // ln x
@@ -834,7 +875,6 @@ namespace collection_of_classes
             Vec c = line_cross(a1, a2, b1, b2);
             return (a1 - c) * (a2 - c) > 0 or (b1 - c) * (b2 - c) > 0 ? Vec(NAN, NAN) : c;
         }
-
     }
 }
 
@@ -844,19 +884,6 @@ namespace math
     // 质数
     namespace prime
     {
-        // 判断素数.
-        bool is_prime(int x)
-        {
-            for (int i = 2; i <= x / i; i++)
-            {
-                if (x % i == 0)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         // 分解因数
         namespace divisors
         {
@@ -871,23 +898,7 @@ namespace math
                 pair<int, int> divisors[MAXP]; // {质因数, 个数}
 
                 // 欧拉筛
-                int prime_sieve_euler(int n)
-                {
-                    int cnt = 0;
-                    vis[1] = true;
-                    for (int i = 2; i <= n; i++)
-                    {
-                        if (not vis[i])
-                            prime[cnt++] = i;
-                        for (int j = 0; j < cnt and prime[j] * i <= n; j++)
-                        {
-                            vis[prime[j] * i] = true;
-                            if (i % prime[j] == 0)
-                                break;
-                        }
-                    }
-                    return cnt;
-                }
+                int prime_sieve_euler(int n) { ; } //  math::prime::sieve::prime_sieve_euler
 
                 // 分解质因数. 参数: x: 原数. 返回: 互异质因数个数.
                 int prime_divisors(int x)
@@ -909,23 +920,6 @@ namespace math
                     if (x > 1)
                         divisors[cnt++] = {x, 1};
                     return cnt;
-                }
-
-                void solve()
-                {
-                    prime_sieve_euler(MAX);
-                    int t;
-                    cin >> t;
-                    while (t--)
-                    {
-                        int x;
-                        cin >> x;
-                        int cnt = prime_divisors(x);
-                        for (int i = 0; i < cnt; i++)
-                        {
-                            cout << divisors[i].first << ' ' << divisors[i].second << endl;
-                        }
-                    }
                 }
             }
 
@@ -1068,7 +1062,7 @@ namespace math
             }
 
             // 线性筛法欧拉函数. 求区间[1, x]中与x互质的数的个数, x 遍历 [1, n]. 复杂度: O(n).
-            namespace linear
+            namespace euler_linear
             {
                 const int MAX = 1000005;
 
@@ -1106,90 +1100,110 @@ namespace math
     }
 
     // 排列组合
-    namespace combinatorics
+    namespace combination
     {
-        namespace dynamic_programming_solution
+        // 组合数
+        namespace combination_number
         {
-            const int MAX = 1005;
-
-            int C[MAX][MAX];
-            inline void load_C(int n)
+            namespace dynamic_programming_solution
             {
-                C[0][0] = 1;
-                for (int i = 1; i <= n; i++)
+                const int MAX = 1005;
+                const int MOD = 1000000007;
+
+                int C[MAX][MAX];
+                void load_C(int n)
                 {
-                    C[i][0] = 1;
-                    for (int j = 1; j < i; j++)
-                        C[i][j] = C[i - 1][j - 1] + C[i - 1][j];
-                    C[i][i] = 1;
+                    C[0][0] = 1;
+                    for (int i = 1; i <= n; i++)
+                    {
+                        C[i][0] = 1;
+                        for (int j = 1; j < i; j++)
+                            C[i][j] = (C[i - 1][j - 1] + C[i - 1][j]) % MOD;
+                        C[i][i] = 1;
+                    }
+                }
+
+                int A[MAX][MAX];
+                void load_A(int n)
+                {
+                    for (int i = 0; i <= n; i++)
+                    {
+                        A[i][0] = 1;
+                        for (int j = 1; j <= i; j++)
+                            A[i][j] = A[i][j - 1] * (i + 1 - j) % MOD;
+                    }
                 }
             }
 
-            int A[MAX][MAX];
-            inline void load_A(int n)
+            namespace inverse_element_solution
             {
-                for (int i = 0; i <= n; i++)
+                // 一般开两倍内存
+                const int MAX = 100005;
+                const int MOD = 1000000007;
+
+                int fac[MAX];
+                void load_fac(int n)
                 {
-                    A[i][0] = 1;
-                    for (int j = 1; j <= i; j++)
-                        A[i][j] = A[i][j - 1] * (i + 1 - j);
+                    for (int i = 0, f = 1; i <= n; i++, f *= i, f %= MOD)
+                        fac[i] = f;
                 }
+
+                int inv[MAX];
+                int quick_pow(int base, int exponent, int modulo)
+                {
+                    int res = 1;
+                    while (exponent)
+                    {
+                        if (exponent & 1)
+                        {
+                            res *= base;
+                            res %= modulo;
+                        }
+                        base *= base;
+                        base %= modulo;
+                        exponent >>= 1;
+                    }
+                    return res;
+                }
+                int inverse_element_fermat(int primal) { return quick_pow(primal, MOD - 2, MOD); }
+                void load_inv(int n)
+                {
+                    for (int i = 0; i <= n; i++)
+                        inv[i] = inverse_element_fermat(fac[i]);
+                }
+
+                int A(int m, int n) { return 0 <= n and n <= m ? fac[m] * inv[n] % MOD : 0; }
+                int C(int m, int n) { return 0 <= n and n <= m ? fac[m] * inv[n] % MOD * inv[m - n] % MOD : 0; }
+            }
+
+            namespace lucas_solution
+            {
+
             }
         }
 
-        namespace inverse_element_solution
+        // 康托展开
+        namespace cantor_expansion
         {
-            // 一般开两倍内存
-            const int MAX = 100005;
             const int MOD = 1000000007;
 
-            int fac[MAX];
-            inline void load_fac(int n)
+            // 0-index
+            int cantor(int *a, int n, int mod = MOD)
             {
-                for (int i = 0, f = 1; i <= n; i++, f *= i, f %= MOD)
-                    fac[i] = f;
             }
 
-            int inv[MAX];
-            inline int quick_pow(int base, int exponent, int modulo)
+            void arc_cantor()
             {
-                int res = 1;
-                while (exponent)
-                {
-                    if (exponent & 1)
-                    {
-                        res *= base;
-                        res %= modulo;
-                    }
-                    base *= base;
-                    base %= modulo;
-                    exponent >>= 1;
-                }
-                return res;
             }
-            inline int inverse_element_fermat(int primal) { return quick_pow(primal, MOD - 2, MOD); }
-            inline void load_inv(int n)
-            {
-                for (int i = 0; i <= n; i++)
-                    inv[i] = inverse_element_fermat(fac[i]);
-            }
-
-            inline int A(int m, int n) { return 0 <= n and n <= m ? fac[m] * inv[n] % MOD : 0; }
-            inline int C(int m, int n) { return 0 <= n and n <= m ? fac[m] * inv[n] % MOD * inv[m - n] % MOD : 0; }
-        }
-
-        namespace lucas_solution
-        {
-
         }
     }
 
     // 欧几里得
-    namespace gcd_
+    namespace gcd
     {
         // 欧几里得算法. 复杂度: O(lg(min(x, y))).
         int __gcd(int x, int y) { return x % y ? __gcd(y, x % y) : y; }
-        inline int gcd(int x, int y) { return x > y ? __gcd(x, y) : __gcd(y, x); }
+        int gcd(int x, int y) { return x > y ? __gcd(x, y) : __gcd(y, x); }
 
         // 扩展欧几里得算法. 求解: 一元二次方程 ax + by = c. 返回: bool-有解. 复杂度: O(lg(min(a, b))).
         int __exgcd(int a, int b, int &x, int &y)
@@ -1207,7 +1221,7 @@ namespace math
             }
             return d;
         }
-        inline bool exgcd(int a, int b, int c, int &x, int &y)
+        bool exgcd(int a, int b, int c, int &x, int &y)
         {
             int _x, _y, g;
             g = __exgcd(a, b, _x, _y);
@@ -1223,7 +1237,7 @@ namespace math
 
         // 线性同余方程. 依赖: exgcd. 求解: 线性同余方程 ax = c (mod m). 返回: 有解: x, 无解: -1. 复杂度: O(lg(min(a, m))).
         const int MOD = 1000000007;
-        inline int linear_congruence_theorem(int a, int c, int m = MOD)
+        int linear_congruence_theorem(int a, int c, int m = MOD)
         {
             int x, y;
             bool flag = exgcd(a, m, c, x, y);
@@ -1231,13 +1245,13 @@ namespace math
         }
     }
 
-    // 逆元和快速幂
-    namespace inverse_element
+    // 快速幂
+    namespace quick_pow
     {
         const int MOD = 1000000007;
 
         // 快速幂. 复杂度: O(log(exponent))
-        inline int quick_pow(int base, int exponent)
+        int quick_pow(int base, int exponent)
         {
             int res = 1;
             while (exponent)
@@ -1249,7 +1263,7 @@ namespace math
             }
             return res;
         }
-        inline int quick_pow(int base, int exponent, int modulo = MOD)
+        int quick_pow(int base, int exponent, int modulo = MOD)
         {
             int res = 1;
             while (exponent)
@@ -1266,39 +1280,24 @@ namespace math
             return res;
         }
 
+        // 龟速乘. 复杂度: O(log(exponent))
+
+        // 矩阵快速幂. 复杂度: O(log(exponent))
+    }
+
+    // 逆元
+    namespace inverse_element
+    {
+        const int MOD = 1000000007;
+        int quick_pow(int base, int exponent, int modulo = MOD) { ; } // math::quick_pow::quick_pow
+
         // 费马小定理求逆元. 依赖: quick_pow. 复杂度: O(log(modulo)).
-        inline int inverse_element_fermat(int primal, int modulo = MOD) { return quick_pow(primal, modulo - 2, modulo); }
+        int inverse_element_fermat(int primal, int modulo = MOD) { return quick_pow(primal, modulo - 2, modulo); }
 
         // 扩展欧几里得算法求逆元. 依赖: exgcd. 复杂度: O(log(modulo))
-        int __exgcd(int a, int b, int &x, int &y)
-        {
-            int d = a;
-            if (b != 0)
-            {
-                d = __exgcd(b, a % b, y, x);
-                y -= (a / b) * x;
-            }
-            else
-            {
-                x = 1;
-                y = 0;
-            }
-            return d;
-        }
-        inline bool exgcd(int a, int b, int c, int &x, int &y)
-        {
-            int _x, _y, g;
-            g = __exgcd(a, b, _x, _y);
-            if (c % g == 0)
-            {
-                x = c / g * _x;
-                y = c / g * _y;
-                return true;
-            }
-            else
-                return false;
-        }
-        inline int inverse_element_exgcd(int primal, int modulo = MOD)
+        int __exgcd(int a, int b, int &x, int &y) { ; }       // math::gcd::__exgcd
+        bool exgcd(int a, int b, int c, int &x, int &y) { ; } // math::gcd::exgcd
+        int inverse_element_exgcd(int primal, int modulo = MOD)
         {
             int x, y;
             bool flag = exgcd(primal, modulo, 1, x, y);
@@ -1306,21 +1305,8 @@ namespace math
         }
 
         // Useless - 欧拉定理求逆元. 依赖: euler. 复杂度: O(log(modulo)) + 预处理: O(log(modulo)) -> O(modulo^0.5)
-        inline int euler(int x)
-        {
-            int res = x;
-            for (int i = 2; i <= x / i; i++)
-                if (x % i == 0)
-                {
-                    res = res / i * (i - 1);
-                    while (x % i == 0)
-                        x /= i;
-                }
-            if (x > 1)
-                res = res / x * (x - 1);
-            return res;
-        }
-        inline int inverse_element_euler(int primal, int modulo = MOD)
+        int euler(int x) { ; } // math::prime::interval_coprime::euler
+        int inverse_element_euler(int primal, int modulo = MOD)
         {
             static int eu = -1, last = -1;
             if (modulo != last) // 预处理: modulo 变化的时候执行. 如果 modulo 反复变化这里会 TLE.
@@ -1340,7 +1326,7 @@ namespace math
         }
 
         // 线性筛求逆元. 求 [1, range] 所有数的逆元. 复杂度: O(range).
-        inline void inverse_element_linear(int range, int modulo, int res[])
+        void inverse_element_linear(int range, int modulo, int res[])
         {
             res[1] = 1;
             for (int i = 2; i <= range; i++)
@@ -1456,44 +1442,47 @@ namespace data_structure
         const int SQR = 320;
 
         int a[MAX];
-        int size_;
+        int siz;
         int block[SQR][SQR];
         int sum[SQR] = {0};
         int lazy[SQR] = {0};
 
         void build(int n)
         {
-            size_ = sqrt(n);
+            siz = sqrt(n);
             for (int i = 0; i < n; i++)
             {
-                block[i / size_][i % size_] = a[i];
-                sum[i / size_] += a[i];
+                block[i / siz][i % siz] = a[i];
+                sum[i / siz] += a[i];
             }
         }
 
         void load(int n)
         {
-            size_ = sqrt(n);
-            for (int i = (n - 1) / size_; i >= 0; i++)
+            siz = sqrt(n);
+            for (int i = (n - 1) / siz; i >= 0; i--)
             {
-                for (int j = 0; j < size_; j++)
+                for (int j = 0; j < siz; j++)
+                {
                     block[i][j] += lazy[i];
+                    a[i * siz + j] = block[i][j];
+                }
                 lazy[i] = 0;
             }
         }
 
         void modify(int l, int r, int val)
         {
-            int ll = (l + size_ - 1) / size_;
-            int dl = (l + size_ - 1) % size_ + 1;
-            int rr = (r + 1) / size_ - 1;
-            int dr = (r + 1) % size_ - 1;
-            for (int i = dl; i < size_; i++)
+            int ll = (l + siz - 1) / siz;
+            int dl = (l + siz - 1) % siz + 1;
+            int rr = (r + 1) / siz - 1;
+            int dr = (r + 1) % siz - 1;
+            for (int i = dl; i < siz; i++)
                 block[ll - 1][i] += val;
-            sum[ll - 1] += (size_ - dl) * val;
+            sum[ll - 1] += (siz - dl) * val;
             for (int i = ll; i <= rr; i++)
             {
-                sum[i] += size_ * val;
+                sum[i] += siz * val;
                 lazy[i] += val;
             }
             for (int i = 0; i <= dr; i++)
@@ -1503,12 +1492,12 @@ namespace data_structure
 
         int query(int l, int r)
         {
-            int ll = (l + size_ - 1) / size_;
-            int dl = (l + size_ - 1) % size_ + 1;
-            int rr = (r + 1) / size_ - 1;
-            int dr = (r + 1) % size_ - 1;
+            int ll = (l + siz - 1) / siz;
+            int dl = (l + siz - 1) % siz + 1;
+            int rr = (r + 1) / siz - 1;
+            int dr = (r + 1) % siz - 1;
             int res = 0;
-            for (int i = dl; i < size_; i++)
+            for (int i = dl; i < siz; i++)
                 res += block[ll - 1][i] + lazy[ll - 1];
             for (int i = ll; i <= rr; i++)
                 res += sum[i];
@@ -1529,7 +1518,7 @@ namespace data_structure
             const int MAX = 100005;
 
             int a[MAX];
-            int size_, l, r, cur;
+            int siz, l, r, cur;
             struct Query
             {
                 int index;
@@ -1542,7 +1531,7 @@ namespace data_structure
             // 排序函数: 左区号升序-右界升序-左界升序
             bool cmp(const Query &x, const Query &y)
             {
-                int xx = x.left / size_, yy = y.left / size_;
+                int xx = x.left / siz, yy = y.left / siz;
                 if (xx != yy)
                     return xx < yy;
                 if (x.right != y.right)
@@ -1572,7 +1561,7 @@ namespace data_structure
                 cin >> n >> q;
                 for (int i = 0; i < n; i++)
                     cin >> a[i];
-                size_ = sqrt(n), l = 0, r = 0, cur = 1, buk[a[0]]++; // Attention: 别忘了设置初始值
+                siz = sqrt(n), l = 0, r = 0, cur = 1, buk[a[0]]++; // Attention: 别忘了设置初始值
                 for (int i = 0; i < q; i++)
                 {
                     cin >> qry[i].left >> qry[i].right;
@@ -1606,23 +1595,60 @@ namespace data_structure
         }
     }
 
-    // 树状数组
+    // 树状数组. 时间: O(logn), 内存: O(n)
     namespace tree_array
     {
+        const int MAX = 100005;
 
+        int n;
+        int a[MAX]; // 1-index
+        struct tree_array
+        {
+            int sum = 0; // Attention: 别忘了设置初值
+        } node[MAX];
+
+#define lowbit(x) ((x) & -(x))
+
+        // 单点修改
+        void modify(int idx, int val)
+        {
+            while (idx <= n)
+            {
+                node[idx].sum += val;
+                idx += lowbit(idx);
+            }
+        }
+
+        // 前缀询问
+        int query(int idx)
+        {
+            int x = 0;
+            while (idx)
+            {
+                x += node[idx].sum;
+                idx -= lowbit(idx);
+            }
+            return x;
+        }
     }
 
     // 线段树. 时间: O(logn) + 预处理: O(n) + 后处理: O(n), 内存: O(4n)
     namespace segment_tree
     {
-        // 基础线段树
-        namespace non_tagged_segment_tree
+        // 基础线段树, 单点修改-区间求和
+        // Maybe 树状数组 is better
+
+        // 带 lazy 标记的线段树 - 以 区间修改-区间求和 为例. 局限性: 大常数
+        // 非模块化. 可读性--, 卡常性++
+        namespace lazy_tagged_segment_tree
         {
 
         }
 
-        // 带lazy标记的线段树 - 以 区间求和-区间修改 为例. 局限性: 近二十倍大常数
-        namespace lazy_tagged_segment_tree
+        // 带 lazy 标记的线段树 - 以 区间求和-区间修改 为例. 局限性: 大常数
+        // 模板化. 可读性++, 卡常性--
+        // https://www.luogu.com.cn/problem/P3372
+        namespace lazy_tagged_segment_tree_plus
         {
             const int MAX = 100005;
 
@@ -1639,33 +1665,27 @@ namespace data_structure
 #define rs(idx) (idx * 2 + 1) // 返回右子节点
 
             // 初始化 idx 索引  // Attention
-            inline void init(SegmentTree &leaf, int idx)
-            {
-                leaf.sum = a[idx];
-            }
+            void init(SegmentTree &leaf, int idx) { leaf.sum = a[idx]; }
 
             // load 导出, 不带 lazy 标记的线段树, 无需 output  // Attention
-            inline void output(const SegmentTree &leaf, int idx)
-            {
-                a[idx] = leaf.sum;
-            }
+            void output(const SegmentTree &leaf, int idx) { a[idx] = leaf.sum; }
 
             // 向上维护, 状态合并方程  // Attention
-            inline SegmentTree &merge_up(SegmentTree &father, const SegmentTree &left, const SegmentTree &right)
+            SegmentTree &merge_up(SegmentTree &father, const SegmentTree &left, const SegmentTree &right)
             {
                 father.sum = left.sum + right.sum;
                 return father;
             }
 
-            // lazy 初始方程  // Attention
-            inline void lazy_init(SegmentTree &node, int val)
+            // lazy 变换方程  // Attention
+            void lazy_it(SegmentTree &node, int val)
             {
                 node.sum += val * (node.right - node.left + 1);
                 node.lazy += val;
             }
 
             // 向下维护, lazy 传递方程  // Attention
-            inline void lazy_down(SegmentTree &father, SegmentTree &left, SegmentTree &right)
+            void lazy_down(SegmentTree &father, SegmentTree &left, SegmentTree &right)
             {
                 // 前两步务必在后三步前面
                 left.sum += father.lazy * (left.right - left.left + 1);
@@ -1692,7 +1712,7 @@ namespace data_structure
                 node[idx].right = node[ri].right;
                 merge_up(node[idx], node[li], node[ri]);
             }
-            inline void build(int n) { build(1, n, 1); }
+            void build(int n) { build(1, n, 1); }
 
             // 全载, 清空并重置 lazy, 不带 lazy 标记的线段树, 无需 load
             void load(int l, int r, int idx)
@@ -1708,14 +1728,14 @@ namespace data_structure
                 load(mid + 1, r, ri);
                 merge_up(node[idx], node[li], node[ri]);
             }
-            inline void load(int n) { load(1, n, 1); }
+            void load(int n) { load(1, n, 1); }
 
             // 区间修改, 不带 lazy 标记的线段树, 无法 modify
             void modify(int l, int r, int val, int idx)
             {
                 if (l <= node[idx].left and node[idx].right <= r)
                 {
-                    lazy_init(node[idx], val);
+                    lazy_it(node[idx], val);
                     return;
                 }
                 int li = ls(idx), ri = rs(idx), mid = (node[idx].left + node[idx].right) / 2;
@@ -1726,7 +1746,7 @@ namespace data_structure
                     modify(l, r, val, ri);
                 merge_up(node[idx], node[li], node[ri]);
             }
-            inline void modify(int l, int r, int val) { modify(l, r, val, 1); }
+            void modify(int l, int r, int val) { modify(l, r, val, 1); }
 
             // 区间查询
             SegmentTree query(int l, int r, int idx)
@@ -1744,7 +1764,7 @@ namespace data_structure
                     res = merge_up(node[0], res, query(l, r, ri));
                 return res;
             }
-            inline SegmentTree query(int l, int r) { return query(l, r, 1); }
+            SegmentTree query(int l, int r) { return query(l, r, 1); }
         }
 
         // 带权线段树 - 以 计数小于x-单点修改 为例. 局限性: 不离散数域决定内存, 离散化或将约束修改
@@ -1763,7 +1783,7 @@ namespace data_structure
 #define rs(idx) (idx * 2 + 1) // 返回右子节点
 
             // 向上维护, 状态合并方程  // Attention
-            inline SegmentTree &merge_up(SegmentTree &father, const SegmentTree &left, const SegmentTree &right)
+            SegmentTree &merge_up(SegmentTree &father, const SegmentTree &left, const SegmentTree &right)
             {
                 father.tot = left.tot + right.tot;
                 return father;
@@ -1785,7 +1805,7 @@ namespace data_structure
                 node[idx].right = node[ri].right;
                 merge_up(node[idx], node[li], node[ri]);
             }
-            inline void build(int n) { build(1, n, 1); }
+            void build(int n) { build(1, n, 1); }
 
             // 单点插入  // Attention
             void insert(int x, int idx)
@@ -1802,7 +1822,7 @@ namespace data_structure
                     insert(x, ri);
                 merge_up(node[idx], node[li], node[ri]);
             }
-            inline void insert(int x) { insert(x, 1); }
+            void insert(int x) { insert(x, 1); }
 
             // 区间查询  // Attention
             int query(int x, int idx)
@@ -1815,7 +1835,7 @@ namespace data_structure
                 else
                     return node[li].tot + query(x, ri);
             }
-            inline int query(int x) { return query(x, 1); }
+            int query(int x) { return query(x, 1); }
         }
 
         // 可持续化线段树(主席树) - 以 计数区间第k小为例. 时间: O(logn) + 预处理: O(n), 内存: O(4n+3i+ilogn)
@@ -1863,7 +1883,7 @@ namespace data_structure
                 version[++len_version] = {0, node[li].version.back(), node[ri].version.back(), 0};
                 node[idx].version.push_back(len_version);
             }
-            inline void build(int n) { build(1, n, 1); }
+            void build(int n) { build(1, n, 1); }
 
             // 单点插入  // Attention
             void insert(int x, int idx)
@@ -1882,7 +1902,7 @@ namespace data_structure
                 version[++len_version] = {now_id, node[li].version.back(), node[ri].version.back(), version[node[idx].version.back()].tot + 1};
                 node[idx].version.push_back(len_version);
             }
-            inline void insert(int x)
+            void insert(int x)
             {
                 now_id++;
                 insert(x, 1);
@@ -1913,7 +1933,7 @@ namespace data_structure
                 else
                     return query(l, r, k - tot, ri, version[lv].right, version[rv].right);
             }
-            inline int query(int l, int r, int k)
+            int query(int l, int r, int k)
             {
                 return query(l, r, k, 1, search(node[1], l - 1), search(node[1], r));
             }
@@ -2006,6 +2026,7 @@ namespace data_structure
     namespace humdrum_structure
     {
         // 单调栈 - 以 最近左较小值 为例. 时间: O(n), 内存: O(n)
+        // https://www.luogu.com.cn/problem/P5788
         namespace humdrum_stack
         {
             // 1-index
@@ -2020,11 +2041,11 @@ namespace data_structure
                 for (int i = 1; i <= n; i++)
                     cin >> a[i];
 
-                stack<pair<int, int>> stk; // 单增
+                stack<pair<int, int>> stk; // ASC
                 stk.push({0, -1});         // Attention: 足够小(如果单增)
                 for (int i = 1; i <= n; i++)
                 {
-                    while (stk.top().second >= a[i]) // Attention
+                    while (stk.top().second > a[i]) // Attention
                         stk.pop();
                     cout << stk.top().second << ' ';
                     stk.push({i, a[i]});
@@ -2034,11 +2055,52 @@ namespace data_structure
         }
 
         // 单调队列 - 以 滑块最小值 为例. 时间: O(n), 内存: O(n)
+        // https://www.luogu.com.cn/problem/P1886
         namespace humdrum_queue
         {
-            // 1-index
             const int MAX = 1000005;
+
             int a[MAX];
+
+            // 此单调队列自动分配索引
+            int siz, now_id, m;
+            int head, tail;
+            pair<int, int> que[MAX]; // ASC
+
+            // 初始化. mm: 滑块长度
+            void init(int mm)
+            {
+                siz = 0, now_id = 0, m = mm;
+                head = 0, tail = 0;
+            }
+
+            // 推入. 只有初始化可直接调用
+            void push(int val)
+            {
+                while (head < tail and que[tail - 1].second > val) // Attention
+                    tail--;
+                que[tail++] = {now_id, val};
+                siz++, now_id++;
+            }
+
+            // 弹出
+            void pop()
+            {
+                if (que[head].first <= now_id - siz)
+                    head++;
+                siz--;
+            }
+
+            // 移动 (推入 + 弹出). 滑块移动一位
+            void move(int val)
+            {
+                push(val);
+                if (siz > m)
+                    pop();
+            }
+
+            // 查询
+            int query() { return que[head].second; }
 
             void solve()
             {
@@ -2046,22 +2108,13 @@ namespace data_structure
                 cin >> n >> m;
                 for (int i = 1; i <= n; i++)
                     cin >> a[i];
-
-                deque<int> que; // 单增
+                init(m);
                 for (int i = 1; i < m; i++)
+                    push(a[i]);
+                for (int i = m; i <= n; i++)
                 {
-                    while (not que.empty() and que.back() > a[i]) // Attention
-                        que.pop_back();
-                    que.push_back(a[i]);
-                }
-                for (int i = 1; i <= n - m + 1; i++)
-                {
-                    while (not que.empty() and que.back() > a[i + m - 1]) // Attention
-                        que.pop_back();
-                    que.push_back(a[i + m - 1]);
-                    cout << que.front() << endl;
-                    if (que.front() == a[i])
-                        que.pop_front();
+                    move(a[i]);
+                    cout << query() << endl;
                 }
             }
         }
@@ -2588,8 +2641,74 @@ namespace dynamic_programming
             }
         }
 
-        // 多重背包. 复杂度: O(nmlogl)
-        namespace limited_knapsack
+        // 多重背包(单调队列优化). 复杂度: O(nm) (跑不过nmlogl)
+        // https://www.acwing.com/problem/content/submission/6/
+        namespace limited_knapsack_limitless
+        {
+            const int MAXN = 1000;
+            const int MAXM = 20000;
+
+            int v[MAXN];
+            int w[MAXN];
+            int c[MAXN];
+            int dp[MAXM];
+
+            int siz, now_id, mm;
+            int head, tail;
+            pair<int, int> que[MAXM];
+
+            void init(int x)
+            {
+                siz = 0, now_id = 0, mm = x;
+                head = 0, tail = 0;
+            }
+            void push(int val)
+            {
+                while (head < tail and que[tail - 1].second < val)
+                    tail--;
+                que[tail++] = {now_id, val};
+                siz++, now_id++;
+            }
+            void pop()
+            {
+                if (que[head].first < now_id - mm)
+                    head++;
+                siz--;
+            }
+            void move(int val)
+            {
+                push(val);
+                if (siz > mm)
+                    pop();
+            }
+            int query() { return que[head].second; }
+
+            void solve()
+            {
+                int n, m;
+                cin >> n >> m;
+                for (int i = 0; i < n; i++)
+                    cin >> v[i] >> w[i] >> c[i];
+                for (int i = 0; i < n; i++)
+                    for (int j = 0; j < v[i]; j++)
+                    {
+                        init(m);
+                        move(dp[j]);
+                        for (int k = v[i] + j, cnt = 1; k <= m; k += v[i], cnt++)
+                        {
+                            int x = query();
+                            move(dp[k] - cnt * w[i]);
+                            dp[k] = max(dp[k], x + cnt * w[i]);
+                        }
+                    }
+                cout << dp[m] << endl;
+            }
+
+        }
+
+        // 多重背包(二进制优化). 复杂度: O(nmlogl)
+        // https://www.acwing.com/problem/content/submission/5/
+        namespace limited_knapsack_01
         {
             const int MAXM = 10005;
             const int MAXN = 105;
@@ -2607,7 +2726,6 @@ namespace dynamic_programming
             void transform()
             {
                 // 对数转换为 01 背包
-                int cnt = 0;
                 for (int i = 0; i < n; i++)
                 {
                     int len = c[i];
@@ -2786,6 +2904,111 @@ namespace dynamic_programming
         namespace divide7conquer_knapsack
         {
 
+        }
+    }
+
+    // 经典排组
+    namespace combination
+    {
+        const int MAX = 1005;
+        const int MOD = 1000000007;
+        int C[MAX][MAX];
+        void load_C(int n) { ; } // math::combination::dynamic_programming_solution
+
+        // 卡特兰数. Whitworth 路线 & 凸包三角划分
+        // {1, 1, 2, 5, 14, 42, 132, 429, ...}
+        // $$Catalan(n) = \sum_{i=0}^{n-1} (Catalan(i)Catalan(n-1-i)) \tag{递推公式1}$$
+        // $$(n-3)Catalan(n) = \frac{n}{2} \sum_{i=3}{n-1} (Catalan(i)Catalan(n-1-i)) \tag{递推公式2}$$
+        // $$Catalan(n) = \frac{C_{2n}^{n}}{n+1} = C_{2n}^{n} - C_{2n}^{n-1} \tag{通项公式}$$
+        /* 解析:
+        1. Whitworth 路线(栈组合问题):
+            考虑最后一次离开对角线的点 (i, i) $(0 \le i \le n-1)$,
+            由于考虑为最后一次离开对角线, 离开 (i, i) 在 (n, n) 前不可回归,
+            将问题分解为子问题: (0, 0) ~ (i, i) 的 Whitworth 路线 & (i+1, i) ~ (n, n-1) 的 Whitworth 路线.
+        2. 凸包三角划分:
+            取一个点为基点, 剩余点标号 0 ~ n-2, 任取 i \in [0, n-3], 以基点 / i点 / (i+1)点为顶点划分三角形,
+            剩余点将构成两个凸包: (i+2) 边凸包 & (n-1-i) 边凸包.
+            f(n) = \sum_{i=0}^{n-3} (f(i+2)f(n-1-i)), f(x) = Catalan(x-2)
+         */
+        // https://www.luogu.com.cn/problem/P1754
+        // https://www.luogu.com.cn/problem/P2532
+        int Catalan(int n) { return (C[2 * n][n] - C[2 * n][n - 1] + MOD) % MOD; }
+
+        // 第一类斯特林数(斯特林轮转数). Stirling1(n, m): 将 n 个不同元素分为 m 个非空轮换组合的方案数
+        // {{1}, {0, 1}, {0, 1, 1}, {0, 2, 3, 1}, {0, 6, 11, 6, 1}, {0, 24, 50, 35, 10, 1}, ...}
+        // $$stirling(n, m) = stirling(n-1, m-1) + (n-1)~stirling(n-1, m)$$
+        /* 解析:
+        n 人坐 m 张圆桌. 考虑 n 号入座:
+        1. n 号独坐 m 号桌.
+        2. n 号可坐任意 1 ~ n-1 号左边.
+         */
+        // https://leetcode.cn/problems/number-of-ways-to-rearrange-sticks-with-k-sticks-visible/
+        // https://www.luogu.com.cn/problem/P4609
+        int stirling[MAX][MAX] = {0};
+        void load_stirling(int n)
+        {
+            stirling[0][0] = 1;
+            for (int i = 1; i <= n; i++)
+                for (int j = 1; j <= i; j++)
+                    stirling[i][j] = (stirling[i - 1][j - 1] + (i - 1) * stirling[i - 1][j]) % MOD;
+        }
+
+        // 第二类斯特林数(斯特林子集数). Stirling2(n, m): 将 n 个不同元素分为 m 个非空集合组合的方案数
+        // {{1}, {0, 1}, {0, 1, 1}, {0, 1, 3, 1}, {0, 1, 7, 6, 1}, {0, 1, 15, 25, 10, 1}, ...}
+        // $$Stirling(n, m) = Stirling(n-1, m-1) + m~Stirling(n-1, m)$$
+        /* 解析:
+        n 人进 m 个房间. 考虑 n 号选择:
+        1. n 号独占 m 号房.
+        2. n 号可选任意 1 ~ m 号房间.
+         */
+        // https://www.luogu.com.cn/problem/P1655
+        // https://www.luogu.com.cn/problem/P3904
+        int Stirling[MAX][MAX] = {0};
+        void load_Stirling(int n)
+        {
+            Stirling[0][0] = 1;
+            for (int i = 1; i <= n; i++)
+                for (int j = 1; j <= i; j++)
+                    Stirling[i][j] = (Stirling[i - 1][j - 1] + j * Stirling[i - 1][j]) % MOD;
+        }
+
+        // 贝尔数. Bell(n): 将 n 个不同元素分为任意个非空集合组合的方案数
+        // {1, 1, 2, 5, 15, 52, 203, 877, ...}
+        // $$Bell(n) = \sum_{k=0}^{n-1} (C_{n-1}^kBell(k)) \tag{递推公式}$$
+        // $$Bell(n) = \sum_{k=1}^{n}Stirling2(n,k) \tag{第二类Stirling数}$$
+        // $$Bell(n) = \frac{1}{e} \sum_{k=0}^{\infty} \frac{k^n}{k!} \tag{Dobinski公式}$$
+        // $$Bell(n+p) \equiv Bell ( n ) + Bell(n+1)~(mod~p)~(p~is~prime) \tag{Touchard同余}$$
+        // $$Bell(n+p^m) \equiv m~Bell(n) + Bell(n+1)~(mod~p)~(p~is~prime) \tag{Touchard同余}$$
+        // $$T(p) = \frac{p^p-1}{p-1}~(p~is~prime) \tag{Bell函数模周期}$$
+        int Bell[MAX];
+        void load_Bell(int n)
+        {
+            fill(Bell, Bell + n + 1, 0);
+            Bell[0] = 1;
+            for (int i = 1; i <= n; i++)
+                for (int j = 0; j < i; j++)
+                    Bell[i] = (Bell[i] + C[i - 1][j] * Bell[j]) % MOD;
+        }
+
+        // 划分数. Part(n, m): 将 n 个相同元素分为不多于 m 个非空集合组合的方案数
+        // $$Part(n, m) = Part(n, m-1) + Part(n-m, m)$$
+        /* 解析:
+        n 枚石子分为 m 堆, 考虑放入 n 号石子:
+        1. n 号创建了第 m 堆石子.
+        2. n 号放入已有 1 ~ m 堆石子,
+            考虑 1 ~ n-1 号已放好,当前放入会与之后放入重复计算.
+            考虑 每堆各取回 1 枚石子, 再将 m 枚石子分别放入每个堆.
+         */
+        int Part[MAX][MAX];
+        void load_Partition(int n)
+        {
+            Part[0][0] = 1;
+            for (int i = 0; i <= n; i++)
+                for (int j = 1; j <= n; j++)
+                    if (i >= j)
+                        Part[i][j] = (Part[i][j - 1] + Part[i - j][j]) % MOD;
+                    else
+                        Part[i][j] = Part[i][j - 1];
         }
     }
 }
@@ -3813,7 +4036,7 @@ namespace sort_
         __quick_sort(q, l, j);
         __quick_sort(q, j + 1, r);
     }
-    inline void quick_sort(int q[], int n) { __quick_sort(q, 0, n - 1); }
+    void quick_sort(int q[], int n) { __quick_sort(q, 0, n - 1); }
 
     // 归并排序. 如果必要, 使用__merge_sort, 其l/r是包含的.
     void __merge_sort(int q[], int l, int r)
@@ -3841,7 +4064,7 @@ namespace sort_
         for (i = l, j = 0; i <= r; i++, j++)
             q[i] = tmp[j];
     }
-    inline void merge_sort(int q[], int n) { __merge_sort(q, 0, n - 1); }
+    void merge_sort(int q[], int n) { __merge_sort(q, 0, n - 1); }
 }
 
 // 二分查找
@@ -3899,7 +4122,7 @@ namespace binary_search
 namespace fast_io
 {
     // 快读. __int128_t 类型必须使用此函数读取.
-    inline int read(int &x)
+    int read(int &x)
     {
         int ans = 0;
         bool f = false;
@@ -3925,7 +4148,7 @@ namespace fast_io
             __write(x / 10);
         putchar(x % 10 + '0');
     }
-    inline void write(int x)
+    void write(int x)
     {
         if (x < 0)
         {
@@ -3954,7 +4177,7 @@ namespace fast_io
 
         ~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
 #endif
-        inline char gc()
+        char gc()
         {
 #if DEBUG // 调试，可显示字符
             return getchar();
@@ -3964,13 +4187,13 @@ namespace fast_io
             return p1 == p2 ? ' ' : *p1++;
         }
 
-        inline bool blank(char ch)
+        bool blank(char ch)
         {
             return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t';
         }
 
         template <class T>
-        inline void read(T &x)
+        void read(T &x)
         {
             register double tmp = 1;
             register bool sign = 0;
@@ -3988,7 +4211,7 @@ namespace fast_io
                 x = -x;
         }
 
-        inline void read(char *s)
+        void read(char *s)
         {
             register char ch = gc();
             for (; blank(ch); ch = gc())
@@ -3998,13 +4221,13 @@ namespace fast_io
             *s = 0;
         }
 
-        inline void read(char &c)
+        void read(char &c)
         {
             for (c = gc(); blank(c); c = gc())
                 ;
         }
 
-        inline void push(const char &c)
+        void push(const char &c)
         {
 #if DEBUG // 调试，可显示字符
             putchar(c);
@@ -4016,7 +4239,7 @@ namespace fast_io
         }
 
         template <class T>
-        inline void write(T x)
+        void write(T x)
         {
             if (x < 0)
                 x = -x, push('-'); // 负数输出
@@ -4031,9 +4254,24 @@ namespace fast_io
         }
 
         template <class T>
-        inline void write(T x, char lastChar)
+        void write(T x, char lastChar)
         {
             write(x), push(lastChar);
         }
     } io;
+}
+
+namespace abab
+{
+    // 1 的 一阶前缀和: n
+    // 1 的 二阶前缀和: n * (n + 1) / 2
+    // 1 的 三阶前缀和: n * (n + 1) * (n + 2) / 6
+    // 1 的 k 阶前缀和: C(n + k - 1, k)
+
+    // n 的 一阶前缀和: n * (n + 1) / 2
+    // n^2 的 一阶前缀和: n * (n + 1) * (2 * n + 1) / 6
+    // n^3 的 一阶前缀和: n * n * (n + 1) * (n + 1) / 4
+
+    // 质因数个数: logn
+    // 因数个数: n^(1/2)
 }
