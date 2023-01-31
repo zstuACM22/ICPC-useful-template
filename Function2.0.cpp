@@ -773,7 +773,88 @@ namespace collection_of_classes
         using mint = ModInt<MOD>;
     }
 
-    // 计算几何
+    // 矩阵类
+    class Matrix
+    {
+    public:
+        vector<vector<int>> data;
+        int n, m;
+        Matrix() : n(0), m(0) {}
+        Matrix(int n, int m) : data(vector<vector<int>>(n, vector<int>(m, 0))), n(n), m(m) {}
+        Matrix(vector<vector<int>> vec) : data(vec), n(data.size()), m(data.front().size()) {}
+        friend istream &operator>>(istream &cin, Matrix &x)
+        {
+            for (vector<int> &vec : x.data)
+                for (int &v : vec)
+                    cin >> v;
+            return cin;
+        }
+        friend ostream &operator<<(ostream &cout, Matrix x)
+        {
+            for (vector<vector<int>>::iterator it = x.data.begin(); it != x.data.end(); it++)
+            {
+                for (vector<int>::iterator jt = it->begin(); jt != it->end(); jt++)
+                    cout << *jt << ' ';
+                cout << endl;
+            }
+            return cout;
+        }
+        vector<int> &operator[](int idx) { return data[idx]; }
+        Matrix operator+(Matrix &x)
+        {
+            if (n != x.n or m != x.m)
+                throw "Matrix size error.";
+            Matrix res(n, m);
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    res[i][j] = data[i][j] + x[i][j];
+            return res;
+        }
+        Matrix operator-(Matrix &x)
+        {
+            if (n != x.n or m != x.m)
+                throw "Matrix size error.";
+            Matrix res(n, m);
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    res[i][j] = data[i][j] - x[i][j];
+            return res;
+        }
+        Matrix operator*(Matrix &x)
+        {
+            if (n != x.m)
+                throw "Matrix size error.";
+            Matrix res(x.n, m);
+            for (int i = 0; i < x.n; i++)
+                for (int j = 0; j < m; j++)
+                    for (int k = 0; k < n; k++)
+                        res[i][j] = res[i][j] + data[k][j] * x[i][k];
+            return res;
+        }
+        Matrix operator*(int x)
+        {
+            Matrix res = *this;
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    res[i][j] *= x;
+            return res;
+        }
+        Matrix operator/(int x)
+        {
+            Matrix res = *this;
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    res[i][j] /= x;
+            return res;
+        }
+        Matrix operator+=(Matrix &x) { return *this = *this + x; }
+        Matrix operator-=(Matrix &x) { return *this = *this - x; }
+        Matrix operator*=(Matrix &x) { return *this = *this * x; }
+        Matrix operator*=(int x) { return *this = *this * x; }
+        Matrix operator/=(int x) { return *this = *this / x; }
+    };
+
+    // 几何类
     // 凸包请见下链接
     // Source: https://zhuanlan.zhihu.com/p/540420439
     namespace geometry
@@ -1269,20 +1350,61 @@ namespace math
             while (exponent)
             {
                 if (exponent & 1)
-                {
-                    res *= base;
-                    res %= modulo;
-                }
-                base *= base;
-                base %= modulo;
+                    res = res * base % modulo;
+                base = base * base % modulo;
                 exponent >>= 1;
             }
             return res;
         }
 
-        // 龟速乘. 复杂度: O(log(exponent))
+        // 龟速乘. 复杂度: O(log(multiplier))
+        int quick_mul(int base, int multiplier)
+        {
+            int res = 1;
+            while (multiplier)
+            {
+                if (multiplier & 1)
+                    res += base;
+                base += base;
+                multiplier >>= 1;
+            }
+            return res;
+        }
+        int quick_mul(int base, int multiplier, int modulo = MOD)
+        {
+            int res = 1;
+            while (multiplier)
+            {
+                if (multiplier & 1)
+                    res = (res + base) % MOD;
+                base = (base << 1) % MOD;
+                multiplier >>= 1;
+            }
+            return res;
+        }
 
-        // 矩阵快速幂. 复杂度: O(log(exponent))
+        class Matrix // collection_of_classes::Matrix
+        {
+        public:
+            Matrix operator*(Matrix &x) { ; }
+            Matrix operator*=(Matrix &x) { return *this = *this * x; }
+        };
+
+        // 矩阵快速幂. 复杂度: O(log(exponent)), 取模需写入 Matrix类中
+        // https://www.luogu.com.cn/problem/P3390
+        Matrix matrix_pow(Matrix base, int exponent)
+        {
+            Matrix res = base;
+            exponent--;
+            while (exponent)
+            {
+                if (exponent & 1)
+                    res *= base;
+                base *= base;
+                exponent >>= 1;
+            }
+            return res;
+        }
     }
 
     // 逆元
@@ -1946,7 +2068,7 @@ namespace data_structure
         struct Trie
         {
             int cnt = 0;
-            map<char, Trie *> next; // O(logn) 访问, 动态内存
+            map<char, Trie *> next; // O(log128) 访问, 动态内存
             // Trie *next[128] = {0};  // O(1) 访问, 静态内存
         } *root = 0;
 
@@ -1955,7 +2077,7 @@ namespace data_structure
         {
             if (p == 0)
                 return;
-            for (pair<char, Trie *> pp : p->next) // 对应 O(logn) 访问
+            for (pair<char, Trie *> pp : p->next) // 对应 O(log128) 访问
                 clear(pp.second);
             // for (int i = 0; i < 128; i++) // 对应 O(1) 访问
             //     clear(p->next[i]);
@@ -2150,9 +2272,9 @@ namespace data_structure
             void state_merge(int x, int y)
             {
                 edges[y] += edges[x];
-                edges[x] = 0;
+                edges[x] = 0; // 可不擦除
                 nodes[y] += nodes[x];
-                nodes[x] = 0;
+                nodes[x] = 0; // 可不擦除
             }
 
             // 返回根节点
@@ -2160,21 +2282,20 @@ namespace data_structure
             {
                 if (father[x] == x)
                     return x;
-                state_merge(x, father[x]);
                 return father[x] = root(father[x]);
             }
 
             // 合并集合
-            void merge(int x, int y)
+            bool merge(int x, int y)
             {
                 x = root(x);
                 y = root(y);
                 edges[x]++; // 新增边
-                if (x != y)
-                {
-                    state_merge(x, y);
-                    father[x] = y;
-                }
+                if (x == y)
+                    return false;
+                state_merge(x, y);
+                father[x] = y;
+                return true;
             }
         }
     }
@@ -3090,7 +3211,7 @@ namespace graph
         {
             const int MAX = 1005;
 
-            int n;
+            int n, m;
             char map_[MAX][MAX];
             int track[MAX][MAX];
             struct XY
@@ -3101,17 +3222,18 @@ namespace graph
                 XY operator*(int v) { return {x * v, y * v}; }
                 bool operator<(XY xy) const { return track[x][y] < track[xy.x][xy.y]; }
                 bool operator>(XY xy) const { return track[x][y] > track[xy.x][xy.y]; }
-                bool is_valid(XY xy) { return 0 <= x and x < n and 0 <= y and y < n and map_[x][y] != 'x' and (track[x][y] == -1 or track[x][y] > track[xy.x][xy.y]); }
-            } st, ed;
+                // attention: map_[x][y] != 'x'， track[x][y] > track[xy.x][xy.y] 在面积搜索中需去掉
+                bool is_valid(XY xy) { return 0 <= x and x < n and 0 <= y and y < m and map_[x][y] != 'x' and (track[x][y] == -1 or track[x][y] > track[xy.x][xy.y]); }
+            };
             vector<XY> next_{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
             queue<XY> que;
 
             void bfs(XY st, XY ed)
             {
-                que.push(st);
                 for (int i = 0; i < n; i++)
                     for (int j = 0; j < n; j++)
                         track[i][j] = -1;
+                que.push(st);
                 track[st.x][st.y] = 0;
                 while (not que.empty() and track[ed.x][ed.y] == -1)
                 {
@@ -3134,11 +3256,12 @@ namespace graph
 
             void solve()
             {
-                cin >> n;
+                XY st, ed;
+                cin >> n >> m;
                 for (int i = 0; i < n; i++)
                 {
                     cin >> map_[i];
-                    for (int j = 0; j < n; j++)
+                    for (int j = 0; j < m; j++)
                         if (map_[i][j] == 'A')
                             st = {i, j};
                         else if (map_[i][j] == 'B')
@@ -3839,6 +3962,7 @@ namespace graph
         // 判断二分图
         namespace is_bpg
         {
+            // 1-index
             const int MAX = 3005;
             int color[MAX] = {0}; // 0: 未染色, 1: 红色, -1: 蓝色
             vector<int> edge[MAX];
@@ -3847,27 +3971,83 @@ namespace graph
             {
                 for (int y : edge[x])
                     if (color[y])
-                        if (color[y] + color[x])
+                    {
+                        if (color[x] + color[y])
                             return false;
-                        else
-                        {
-                            color[y] = -color[x];
-                            if (not dfs(y))
-                                return false;
-                        }
+                    }
+                    else
+                    {
+                        color[y] = -color[x];
+                        if (not dfs(y))
+                            return false;
+                    }
                 return true;
             }
-            bool is_bpg()
+            bool is_bpg(int n)
             {
-                color[1] = 1;
-                return dfs(1);
+                for (int i = 1; i <= n; i++)
+                {
+                    if (color[i] == 0)
+                    {
+                        color[i] = 1;
+                        if (not dfs(i))
+                            return false;
+                    }
+                }
+                return true;
             }
         }
 
-        // 二分图最大匹配(Dinic实现). 时间复杂度: O(mn^0.5)
-        namespace max_marriage
+        // 最大匹配-最小点覆盖
+        // https://www.luogu.com.cn/problem/P3386
+        namespace max_match_min_cover
         {
+            // 匈牙利算法. 时间: O(mn), 空间: O(n+m)
+            namespace hungarian
+            {
+                const int MAX = 505;
 
+                bool vis[MAX];
+                int match[MAX];
+                vector<int> edge[MAX];
+                vector<int> left_node;
+
+                bool dfs(int x)
+                {
+                    for (int y : edge[x])
+                    {
+                        if (vis[y])
+                            continue;
+                        vis[y] = true;
+                        if (match[y] == 0 or dfs(match[y]))
+                        {
+                            match[y] = x;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                // 匈牙利算法
+                int hungarian(int n)
+                {
+                    int res = 0, rn = n - left_node.size();
+                    fill(match, match + rn, 0);
+                    for (int x : left_node)
+                    {
+                        fill(vis, vis + rn, false);
+                        if (dfs(x))
+                            res++;
+                    }
+                    return res;
+                }
+            }
+
+            // dinic 算法. 时间: O(mn^0.5)
+            namespace dinic
+            {
+
+            }
         }
     }
 
@@ -3917,7 +4097,7 @@ namespace graph
             return x;
         }
 
-        // 查询最近公共祖先
+        // 查询最近公共祖先, 不存在返回 -1
         int lca(int x, int y)
         {
             if (depth[x] < depth[y])
@@ -3932,7 +4112,9 @@ namespace graph
                     x = st[x][k];
                     y = st[y][k];
                 }
-            return st[x][0];
+            if (st[x][0] == st[y][0])
+                return st[x][0];
+            return -1;
         }
     }
 
