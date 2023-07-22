@@ -10,8 +10,6 @@ using namespace std;
 // 几何类
 // 凸包请见下链接
 // Source: https://zhuanlan.zhihu.com/p/540420439
-const double EPS = -1e12;
-const double PI = acos(-1.0);
 // 角度用弧度制
 struct Vec {
     double x, y;
@@ -26,13 +24,15 @@ struct Vec {
     Vec operator/(double a) { return Vec(x / a, y / a); }
     friend Vec operator*(double a, Vec b) { return Vec(b.x * a, b.y * a); }
     friend Vec operator/(double a, Vec b) { return Vec(b.x / a, b.y / a); }
-    Vec operator+=(Vec a) { return Vec(x += a.x, y += a.y); }
-    Vec operator-=(Vec a) { return Vec(x -= a.x, y -= a.y); }
-    Vec operator*=(double a) { return Vec(x *= a, y *= a); }
-    Vec operator/=(double a) { return Vec(x /= a, y /= a); }
+    Vec operator+=(Vec a) { return *this + a; }
+    Vec operator-=(Vec a) { return *this - a; }
+    Vec operator*=(double a) { return *this * a; }
+    Vec operator/=(double a) { return *this / a; }
     double operator*(Vec a) { return x * a.x + y * a.y; }  // 点积
     double operator^(Vec a) { return x * a.y - y * a.x; }  // 叉积
-    bool operator<(Vec a) {
+    double operator*=(Vec a) { return *this * a; }
+    double operator^=(Vec a) { return *this ^ a; }
+    bool operator<(Vec a) {  // 极角排序
         if (y == 0 and a.y == 0)
             if (x * a.x >= 0)
                 return fabs(x) < fabs(a.x);
@@ -72,6 +72,8 @@ struct Vec {
 bool is_nan(Vec a) { return isnan(a.x) or isnan(a.y); }
 double abs2(Vec a) { return a.x * a.x + a.y * a.y; }
 double abs(Vec a) { return sqrt(a.x * a.x + a.y * a.y); }
+double dot(Vec a, Vec b) { return a * b; }
+double cross(Vec a, Vec b) { return a ^ b; }
 Vec unit(Vec a) { return a / abs(a); }
 Vec turn90(Vec a) { return Vec(-a.y, a.x); }                                                                   // 逆时针旋转 90 度
 Vec turn(Vec a, double rad) { return Vec(a.x * cos(rad) - a.y * sin(rad), a.y * cos(rad) + a.x * sin(rad)); }  // 逆时针旋转

@@ -7,7 +7,7 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// AC自动机(ACA, AhoCorasickAutomaton, 多模式匹配算法).
+// AC自动机 (ACA, AhoCorasickAutomaton, 多模式匹配算法).
 // 时间: O(An), 内存: O(An) (A 为字符集大小, n 为模式串长度和)
 const int MAX = 1000005;
 

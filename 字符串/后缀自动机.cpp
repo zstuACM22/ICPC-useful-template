@@ -7,7 +7,7 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 后缀自动机(SAM, SuffixAutomaton).
+// 后缀自动机 (SAM, SuffixAutomaton).
 // 时间: O(An), 内存: O(An) (A 为字符集大小, n 为字符最终字符串长度)
 const int MAX = 1000005;
 
