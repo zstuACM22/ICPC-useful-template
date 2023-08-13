@@ -11,9 +11,9 @@ using namespace std;
 // Source: https://blog.csdn.net/xiji333/article/details/120812406, Modified by GreatLiangpi
 class BigInteger {
    private:
-    deque<int32_t> nums;      // 低位到高位存储
-    bool isPositive = true;   // 符号位
-    int32_t length = 0;       // 位数
+    deque<int32_t> nums;             // 低位到高位存储
+    bool isPositive = true;          // 符号位
+    int32_t length = 0;              // 位数
     static const int32_t digit = 8;  // 存储元位数
     static const int32_t mod = 1e8;
 
@@ -30,12 +30,54 @@ class BigInteger {
     bool isZero() const { return nums.size() == 1 && nums.back() == 0; }
     BigInteger absValue() const { return move(BigInteger(nums)); }
 
-    // pair<BigInteger, int> divModCase1(int64_t x) const {}  // m <= 2
-    // pair<BigInteger, BigInteger> divModCase2(const BigInteger &bInt) const {}  // n ~= m
-    // pair<BigInteger, BigInteger> divModCase3(const BigInteger &bInt) const {}  // n >> m
+    pair<BigInteger, int32_t> divModCase1(int32_t bInt) const {  // 高精度除以低精度
+        BigInteger a = absValue();
+        int32_t b = abs(bInt);
+        BigInteger ans;
+        int64_t tmp = 0;
+        for (int32_t i = a.nums.size() - 1; i >= 0; i--) {
+            tmp = tmp * mod + a.nums[i];
+            ans.nums.push_front(tmp / b);
+            tmp %= b;
+        }
+        ans.cutLeadZero();
+        if (isPositive != (bInt >= 0)) {
+            ans.isPositive = false;
+            tmp = -tmp;
+        }
+        return pair<BigInteger, int32_t>{move(ans), tmp};
+    }
+    pair<BigInteger, BigInteger> divModCase2(const BigInteger &bInt) const {  // 高精度除以高精度
+        BigInteger a = absValue();
+        BigInteger b = bInt.absValue();
+        BigInteger ans, tmp;
+        for (int32_t i = a.nums.size() - 1; i >= 0; i--) {
+            tmp.nums.push_front(a.nums[i]);  // 每次偏移 digit 单位
+            tmp.cutLeadZero();
+            // 二分试商
+            int32_t l = 0, r = mod - 1;
+            while (l <= r) {
+                int32_t m = l + r >> 1;
+                if (b * BigInteger(m) <= tmp) {
+                    l = m + 1;
+                } else {
+                    r = m - 1;
+                }
+            }
+            tmp = tmp - b * BigInteger(r);
+            ans.nums.push_front(r);
+        }
+        ans.cutLeadZero();
+        tmp.cutLeadZero();
+        if (isPositive != bInt.isPositive) {
+            ans.isPositive = false;
+            tmp.isPositive = false;
+        }
+        return pair<BigInteger, BigInteger>(move(ans), move(tmp));
+    }
 
    public:
-    BigInteger() {};
+    BigInteger(){};
     BigInteger(const string &s) {
         int32_t n = s.size(), minIdx = 0;
         if (s[0] == '-')
@@ -88,9 +130,11 @@ class BigInteger {
             base *= mod;
             modulo /= mod;
         }
+        if (not isPositive) 
+            res = -res;
         return res;
     }
-    
+
     // 10 的幂
     static BigInteger exp(size_t n) {
         if (n <= 0)
@@ -163,9 +207,9 @@ class BigInteger {
                 return false;
         return true;
     }
-    bool operator>(const BigInteger &bInt) const { return not (*this <= bInt); }
-    bool operator>=(const BigInteger &bInt) const { return not (*this < bInt); }
-    bool operator!=(const BigInteger &bInt) const { return not (*this == bInt); }
+    bool operator>(const BigInteger &bInt) const { return not(*this <= bInt); }
+    bool operator>=(const BigInteger &bInt) const { return not(*this < bInt); }
+    bool operator!=(const BigInteger &bInt) const { return not(*this == bInt); }
 
     BigInteger operator+(const BigInteger &bInt) const {
         if (!bInt.isPositive)
@@ -222,36 +266,17 @@ class BigInteger {
         }
         return move(BigInteger(ans, isPositive == bInt.isPositive));
     }
-    
-    // 同时获取整除和余数. 时间: O(nm log(mod))
+
+    // 同时获取整除和余数. 时间: O(nm digit)
     pair<BigInteger, BigInteger> divMod(const BigInteger &bInt) const {
-        BigInteger a = absValue();
-        BigInteger b = bInt.absValue();
-        if (b.isZero())
-            return pair<BigInteger, BigInteger>(*this, move(b));
-        if (a < b)
-            return pair<BigInteger, BigInteger>(move(BigInteger(0)), *this);
-        BigInteger ans, tmp;
-        if (isPositive != bInt.isPositive) ans.isPositive = false;
-        for (int32_t i = a.nums.size() - 1; i >= 0; i--) {
-            tmp.nums.push_front(a.nums[i]);  // 每次偏移 digit 单位
-            tmp.cutLeadZero();
-            // 二分试商
-            int32_t l = 0, r = mod - 1;
-            while (l <= r) {
-                int32_t m = l + r >> 1;
-                if (b * BigInteger(m) <= tmp) {
-                    l = m + 1;
-                } else {
-                    r = m - 1;
-                }
-            }
-            tmp = tmp - b * BigInteger(r);
-            ans.nums.push_front(r);
-        }
-        ans.cutLeadZero();
-        tmp.cutLeadZero();
-        return pair<BigInteger, BigInteger>(move(BigInteger(ans)), move(tmp));
+        if (bInt.isZero())
+            throw invalid_argument("divisors cannot be zero.");
+        else if (*this < bInt)
+            return pair<BigInteger, BigInteger>{0, *this};
+        else if (bInt.nums.size() <= 1)
+            return divModCase1(int64_t(bInt));
+        else
+            return divModCase2(bInt);
     }
     BigInteger operator/(const BigInteger &bInt) const { return move(divMod(bInt).first); }
     BigInteger operator%(const BigInteger &bInt) const { return move(divMod(bInt).second); }
@@ -268,7 +293,6 @@ class BigInteger {
     // 仅提供 ++BigInteger, 无 BigInteger++
     BigInteger &operator++() { return *this += 1; }
     BigInteger &operator--() { return *this -= 1; }
-
 
     BigInteger &operator=(const BigInteger &bInt) {
         if (bInt == *this)

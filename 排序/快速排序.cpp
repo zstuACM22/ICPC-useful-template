@@ -7,8 +7,8 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 快速排序. 如果必要, 使用__quick_sort, 其l/r是包含的. 时间: O(nlogn) -> O(n^2), 空间: O(nlogn)
-void __quick_sort(int q[], int l, int r) {
+// 快速排序. 如果必要, 使用_quick_sort, 其l/r是包含的. 时间: O(nlogn) -> O(n^2), 空间: O(nlogn)
+void _quick_sort(int q[], int l, int r) {
     if (l >= r) return;
     int i = l - 1, j = r + 1, x = q[l + r >> 1];
     while (i < j) {
@@ -19,7 +19,7 @@ void __quick_sort(int q[], int l, int r) {
         if (i < j)
             swap(q[i], q[j]);
     }
-    __quick_sort(q, l, j);
-    __quick_sort(q, j + 1, r);
+    _quick_sort(q, l, j);
+    _quick_sort(q, j + 1, r);
 }
-void quick_sort(int q[], int n) { __quick_sort(q, 0, n - 1); }
+void quick_sort(int q[], int n) { _quick_sort(q, 0, n - 1); }

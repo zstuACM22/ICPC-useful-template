@@ -11,9 +11,9 @@ using namespace std;
 // 求解 base ^ x = rest (mod modulo)的最小正整数解, 不要求 modulo 为质数
 // 时间: O(modulo^0.5 log(modulo))
 
-// 快速幂
 int quick_pow(int base, int exponent, int modulo) {
-    int res = 1;
+    int res = 1 % modulo;
+    base %= modulo;
     while (exponent) {
         if (exponent & 1)
             res = res * base % modulo;
@@ -23,11 +23,10 @@ int quick_pow(int base, int exponent, int modulo) {
     return res;
 }
 
-// 扩展欧几里得
-int __exgcd(int a, int b, int &x, int &y) {
+int _exgcd(int a, int b, int &x, int &y) {
     int d = a;
     if (b != 0) {
-        d = __exgcd(b, a % b, y, x);
+        d = _exgcd(b, a % b, y, x);
         y -= (a / b) * x;
     } else {
         x = 1;
@@ -35,23 +34,23 @@ int __exgcd(int a, int b, int &x, int &y) {
     }
     return d;
 }
-bool exgcd(int a, int b, int c, int &x, int &y) {
+inline bool exgcd(int a, int b, int c, int &x, int &y) {
     int _x, _y, g;
-    g = __exgcd(a, b, _x, _y);
-    if (c % g == 0) {
-        x = c / g * _x;
-        y = c / g * _y;
-        return true;
-    } else
-        return false;
+    g = _exgcd(a, b, _x, _y);
+    if (c % g) return false;
+    int p = b / g;
+    x = (c / g * _x % p + p) % p;
+    y = (c - a * x) / b;
+    return true;
 }
 
-// 逆元
-int inv(int primal, int modulo) {
+inline int linear_congruence_theorem(int a, int c, int m) {
     int x, y;
-    bool flag = exgcd(primal, modulo, 1, x, y);
-    return flag ? (x % modulo + modulo) % modulo : -1;
+    bool flag = exgcd(a, m, c, x, y);
+    return flag ? x : -1;
 }
+
+inline int inv(int primal, int modulo) { return linear_congruence_theorem(primal, 1, modulo); }
 
 // 大步小步
 int BSGS(int base, int rest, int modulo) {

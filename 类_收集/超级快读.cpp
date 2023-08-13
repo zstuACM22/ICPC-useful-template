@@ -19,7 +19,7 @@ class IO {
     char buf[MAXSIZE], *p1, *p2;
     char pbuf[MAXSIZE], *pp;
     bool eof = false;
-#if LOCAL
+#ifdef LOCAL
 #else
     IO() : p1(buf), p2(buf), pp(pbuf) {
     }
@@ -27,7 +27,7 @@ class IO {
     ~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
 #endif
     inline char gc() {
-#if LOCAL  // 调试，可显示字符
+#ifdef LOCAL  // 调试，可显示字符
         return getchar();
 #else
         if (p1 == p2)
@@ -83,7 +83,7 @@ class IO {
     }
 
     inline void push(const char &c) {
-#if LOCAL  // 调试，可显示字符
+#ifdef LOCAL  // 调试，可显示字符
         putchar(c);
 #else
         if (pp - pbuf == MAXSIZE)
@@ -119,7 +119,7 @@ class IO {
     }
 
     template <class T>
-    inline void write(T x, char lastChar) {
+    inline void write(T x, const char &lastChar) {
         write(x);
         push(lastChar);
     }

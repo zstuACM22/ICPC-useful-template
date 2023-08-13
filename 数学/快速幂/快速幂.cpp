@@ -20,12 +20,26 @@ int quick_pow(int base, int exponent) {
     }
     return res;
 }
+
 int quick_pow(int base, int exponent, int modulo = MOD) {
     int res = 1 % modulo;
+    base %= modulo;
     while (exponent) {
         if (exponent & 1)
             res = res * base % modulo;
         base = base * base % modulo;
+        exponent >>= 1;
+    }
+    return res;
+}
+
+int quick_pow(int base, int exponent) {
+    int res = 1 % MOD;
+    base %= MOD;
+    while (exponent) {
+        if (exponent & 1)
+            res = res * base % MOD;
+        base = base * base % MOD;
         exponent >>= 1;
     }
     return res;

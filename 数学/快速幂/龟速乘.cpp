@@ -20,12 +20,28 @@ int slow_mul(int base, int multiplier) {
     }
     return res;
 }
+
 int slow_mul(int base, int multiplier, int modulo = MOD) {
     int res = 0;
+    base %= modulo;
+    multiplier %= modulo;
     while (multiplier) {
         if (multiplier & 1)
             res = (res + base) % modulo;
         base = (base << 1) % modulo;
+        multiplier >>= 1;
+    }
+    return res;
+}
+
+int slow_mul(int base, int multiplier) {
+    int res = 0;
+    base %= MOD;
+    multiplier %= MOD;
+    while (multiplier) {
+        if (multiplier & 1)
+            res = (res + base) % MOD;
+        base = (base << 1) % MOD;
         multiplier >>= 1;
     }
     return res;

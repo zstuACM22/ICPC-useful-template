@@ -7,14 +7,14 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 扩展欧几里得算法求逆元. 依赖: exgcd. 复杂度: O(log(modulo))
+// 扩欧求逆元. 不要求模是质数. 复杂度: O(log(modulo))
 const int MOD = 1000000007;
 
-// 扩展欧几里得算法. 求解: 二元一次方程 ax + by = c. 返回: bool-有解. 复杂度: O(lg(min(a, b))).
-int __exgcd(int a, int b, int &x, int &y) {
+// 扩展欧几里得
+int _exgcd(int a, int b, int &x, int &y) {
     int d = a;
     if (b != 0) {
-        d = __exgcd(b, a % b, y, x);
+        d = _exgcd(b, a % b, y, x);
         y -= (a / b) * x;
     } else {
         x = 1;
@@ -22,19 +22,22 @@ int __exgcd(int a, int b, int &x, int &y) {
     }
     return d;
 }
-bool exgcd(int a, int b, int c, int &x, int &y) {
+inline bool exgcd(int a, int b, int c, int &x, int &y) {
     int _x, _y, g;
-    g = __exgcd(a, b, _x, _y);
-    if (c % g == 0) {
-        x = c / g * _x;
-        y = c / g * _y;
-        return true;
-    } else
-        return false;
+    g = _exgcd(a, b, _x, _y);
+    if (c % g) return false;
+    int p = b / g;
+    x = (c / g * _x % p + p) % p;
+    y = (c - a * x) / b;
+    return true;
 }
 
-int inv(int primal, int modulo = MOD) {
+// 线性同余方程
+inline int linear_congruence_theorem(int a, int c, int m) {
     int x, y;
-    bool flag = exgcd(primal, modulo, 1, x, y);
-    return flag ? (x % modulo + modulo) % modulo : -1;
+    bool flag = exgcd(a, m, c, x, y);
+    return flag ? x : -1;
 }
+
+// 扩展欧几里得求逆元
+inline int inv(int primal) { return linear_congruence_theorem(primal, 1, MOD); }

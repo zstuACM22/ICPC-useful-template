@@ -16,12 +16,12 @@ int dfn[MAX], cnt_dfn = 0;
 pair<int, int> cut[MAX];
 int cnt_cut = 0;
 
-void __tarjan(int x, int pre) {
+void _tarjan(int x, int pre) {
     bool flag = false;
     low[x] = dfn[x] = ++cnt_dfn;
     for (int y : edge[x])
         if (dfn[y] == 0) {
-            __tarjan(y, x);
+            _tarjan(y, x);
             // 除去树边, 该点无法连到其前驱
             if (low[y] > dfn[x]) cut[cnt_cut++] = {x, y};
             low[y] = min(low[y], low[x]);
@@ -37,5 +37,5 @@ void tarjan(int n) {
     cnt_cut = 0;
     for (int i = 1; i <= n; i++)
         if (dfn[i] == 0)
-            __tarjan(i, i);
+            _tarjan(i, i);
 }

@@ -11,19 +11,19 @@ using namespace std;
 const int MAX = 1000005;
 
 vector<int> edge[MAX];
-bool in_stk[MAX] = {false};     // 访问标记
+bool in_stk[MAX] = {false};  // 访问标记
 int low[MAX];                // scc 并查集的前驱
 int dfn[MAX], cnt_dfn = 0;   // dfs 序号
 int stk[MAX], cnt_stk = 0;   // 临时栈, 用于延迟获取 scc 成员
 int root[MAX], cnt_scc = 0;  // scc 并查集的根, 以及 scc 的数量
 
-void __tarjan(int x) {
+void _tarjan(int x) {
     low[x] = dfn[x] = ++cnt_dfn;
     in_stk[x] = true;
     stk[cnt_stk++] = x;
     for (int y : edge[x])
         if (dfn[y] == 0) {
-            __tarjan(y);
+            _tarjan(y);
             low[x] = min(low[x], low[y]);
         } else if (in_stk[y])
             low[x] = min(low[x], dfn[y]);
@@ -43,7 +43,7 @@ void tarjan(int n) {
     cnt_scc = 0;
     for (int i = 1; i <= n; i++)
         if (dfn[i] == 0)
-            __tarjan(i);
+            _tarjan(i);
 }
 
 int weight2[MAX];        // 合并点权

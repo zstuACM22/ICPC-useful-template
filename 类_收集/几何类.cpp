@@ -77,7 +77,7 @@ double cross(Vec a, Vec b) { return a ^ b; }
 Vec unit(Vec a) { return a / abs(a); }
 Vec turn90(Vec a) { return Vec(-a.y, a.x); }                                                                   // 逆时针旋转 90 度
 Vec turn(Vec a, double rad) { return Vec(a.x * cos(rad) - a.y * sin(rad), a.y * cos(rad) + a.x * sin(rad)); }  // 逆时针旋转
-double height(Vec a, Vec b1, Vec b2) { return fabs((b1 - a) ^ (b2 - a)) / abs(b1 - b2); }                      // 点线距离
+
 
 // cos 夹角
 double angle_cos(Vec a, Vec b) {
@@ -90,15 +90,20 @@ double angle_tan(Vec a, Vec b) {
     return angle_cos(a, b) >= 0 ? f : -f;
 }
 
+// 点到直线距离
+double point_to_line(Vec a, Vec b1, Vec b2) {
+    return fabs((b1 - a) ^ (b2 - a)) / abs(b1 - b2);
+}
+
 // 直线交点
-Vec line_cross(Vec a1, Vec a2, Vec b1, Vec b2) {
+Vec line_cross_line(Vec a1, Vec a2, Vec b1, Vec b2) {
     a2 -= a1;
     b2 -= b1;
     return b2 ^ a2 ? a1 + (b2 ^ (b1 - a1)) / (b2 ^ a2) * a2 : Vec(NAN, NAN);
 }
 
 // 线段交点
-Vec segment_cross(Vec a1, Vec a2, Vec b1, Vec b2) {
-    Vec c = line_cross(a1, a2, b1, b2);
+Vec segment_cross_segment(Vec a1, Vec a2, Vec b1, Vec b2) {
+    Vec c = line_cross_line(a1, a2, b1, b2);
     return (a1 - c) * (a2 - c) > 0 or (b1 - c) * (b2 - c) > 0 ? Vec(NAN, NAN) : c;
 }

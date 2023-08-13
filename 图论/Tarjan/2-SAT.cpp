@@ -20,13 +20,13 @@ int dfn[MAX << 1], cnt_dfn = 0;
 int stk[MAX << 1], cnt_stk = 0;
 int scn[MAX << 1], cnt_scc = 0;
 
-void __tarjan(int x) {
+void _tarjan(int x) {
     low[x] = dfn[x] = ++cnt_dfn;
     in_stk[x] = true;
     stk[cnt_stk++] = x;
     for (int y : edge[x])
         if (dfn[y] == 0) {
-            __tarjan(y);
+            _tarjan(y);
             low[x] = min(low[x], low[y]);
         } else if (in_stk[y])
             low[x] = min(low[x], dfn[y]);
@@ -45,7 +45,7 @@ void tarjan(int n) {
     cnt_scc = 0;
     for (int i = 2; i < 2 * n + 2; i++)
         if (dfn[i] == 0)
-            __tarjan(i);
+            _tarjan(i);
 }
 
 bool sat[MAX];  // 布尔选择 (特解)

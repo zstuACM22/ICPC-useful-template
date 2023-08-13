@@ -7,7 +7,7 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 线性筛求逆元. 求 [1, range] 所有数的逆元. 复杂度: O(range).
+// 线性递推求逆元. 要求模是质数. 求 [1, range] 所有数的逆元. 复杂度: O(range).
 const int MOD = 1000000007;
 void inv_liner(int range, int modulo, int res[]) {
     res[1] = 1;

@@ -7,18 +7,21 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 费马小定理求逆元. 依赖: quick_pow. 复杂度: O(log(modulo)).
+// 费小求逆元. 要求模是质数. 依赖: quick_pow. 复杂度: O(log(MOD)).
 const int MOD = 1000000007;
 
-int quick_pow(int base, int exponent, int modulo = MOD) {
-    int res = 1;
+// 快速幂
+int quick_pow(int base, int exponent) {
+    int res = 1 % MOD;
+    base %= MOD;
     while (exponent) {
         if (exponent & 1)
-            res = res * base % modulo;
-        base = base * base % modulo;
+            res = res * base % MOD;
+        base = base * base % MOD;
         exponent >>= 1;
     }
     return res;
 }
 
-int inv(int primal, int modulo = MOD) { return quick_pow(primal, modulo - 2, modulo); }
+// 费马小定理求逆元
+inline int inv(int primal) { return quick_pow(primal, MOD - 2); }

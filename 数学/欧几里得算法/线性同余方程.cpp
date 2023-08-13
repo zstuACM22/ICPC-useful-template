@@ -8,13 +8,14 @@
 using namespace std;
 
 // 线性同余方程
+const int MOD = 1000000007;
 
 // 扩展欧几里得算法. 求解: 二元一次方程 ax + by = c. 复杂度: O(log(min(a, b))).
 // 引用参数返回 x 最小非负整数解
-int __exgcd(int a, int b, int &x, int &y) {
+int _exgcd(int a, int b, int &x, int &y) {
     int d = a;
     if (b != 0) {
-        d = __exgcd(b, a % b, y, x);
+        d = _exgcd(b, a % b, y, x);
         y -= (a / b) * x;
     } else {
         x = 1;
@@ -22,22 +23,19 @@ int __exgcd(int a, int b, int &x, int &y) {
     }
     return d;
 }
-bool exgcd(int a, int b, int c, int &x, int &y) {
+inline bool exgcd(int a, int b, int c, int &x, int &y) {
     int _x, _y, g;
-    g = __exgcd(a, b, _x, _y);
-    if (c % g == 0) {
-        int p = b / g;
-        x = (c / g * _x % p + p) % p;
-        y = (c - a * x) / b;
-        return true;
-    } else
-        return false;
+    g = _exgcd(a, b, _x, _y);
+    if (c % g) return false;
+    int p = b / g;
+    x = (c / g * _x % p + p) % p;
+    y = (c - a * x) / b;
+    return true;
 }
 
 // 线性同余方程. 依赖: exgcd. 求解: 线性同余方程 ax = c (mod m). 返回: 有解: x, 无解: -1. 复杂度: O(log(min(a, m))).
-const int MOD = 1000000007;
-int linear_congruence_theorem(int a, int c, int m = MOD) {
+inline int linear_congruence_theorem(int a, int c, int m = MOD) {
     int x, y;
     bool flag = exgcd(a, m, c, x, y);
-    return flag ? (x % m + m) % m : -1;
+    return flag ? x : -1;
 }

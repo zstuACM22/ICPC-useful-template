@@ -8,11 +8,11 @@
 using namespace std;
 
 // 扩展欧几里得算法. 求解: 二元一次方程 ax + by = c. 复杂度: O(log(min(a, b))).
-// 引用返回 x 最小非负整数解
-int __exgcd(int a, int b, int &x, int &y) {
+// 求解 x 最小非负整数解, 通解为 (x + k * b / g, y - k * a / g)
+int _exgcd(int a, int b, int &x, int &y) {
     int d = a;
     if (b != 0) {
-        d = __exgcd(b, a % b, y, x);
+        d = _exgcd(b, a % b, y, x);
         y -= (a / b) * x;
     } else {
         x = 1;
@@ -20,14 +20,15 @@ int __exgcd(int a, int b, int &x, int &y) {
     }
     return d;
 }
-bool exgcd(int a, int b, int c, int &x, int &y) {
+inline bool exgcd(int a, int b, int c, int &x, int &y) {
     int _x, _y, g;
-    g = __exgcd(a, b, _x, _y);
-    if (c % g == 0) {
-        int p = b / g;
-        x = (c / g * _x % p + p) % p;
-        y = (c - a * x) / b;
-        return true;
-    } else
-        return false;
+    g = _exgcd(a, b, _x, _y);
+    if (c % g) return false;
+    int p = b / g;
+    x = (c / g * _x % p + p) % p;
+    y = (c - a * x) / b;
+    // 可以改为如下, 但返回任意解
+    // x = c / g * _x;
+    // y = c / g * _y;
+    return true;
 }

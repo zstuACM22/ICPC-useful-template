@@ -14,7 +14,8 @@ using namespace std;
 
 // 快速幂
 int quick_pow(int base, int exponent, int modulo) {
-    int res = 1;
+    int res = 1 % modulo;
+    base %= modulo;
     while (exponent) {
         if (exponent & 1)
             res = res * base % modulo;

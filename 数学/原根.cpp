@@ -7,12 +7,19 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 原根
+// 原根. 时间: 最小原根: O(n^0.25*log(n)), 所有原根: O(euler(n))
 const int MAX = 1000005;
+const int USEFUL_MIN_ROOT[][2] = {
+    {998244353, 3},
+    {1000000007, 5},
+    {1000000009, 13},
+    {1004535809, 3}
+};  // 998244353 * 1004535809 > 1e18
 
 // 快速幂
 int quick_pow(int base, int exponent, int modulo) {
-    int res = 1;
+    int res = 1 % modulo;
+    base %= modulo;
     while (exponent) {
         if (exponent & 1)
             res = res * base % modulo;
@@ -23,7 +30,7 @@ int quick_pow(int base, int exponent, int modulo) {
 }
 
 // 欧拉函数
-int euler(int x) {
+int _euler(int x) {
     int res = x;
     for (int i = 2; i <= x / i; i++)
         if (x % i == 0) {
@@ -33,6 +40,12 @@ int euler(int x) {
         }
     if (x > 1)
         res = res / x * (x - 1);
+    return res;
+}
+inline int euler(int x) {
+    static int old = -1, res = -1;
+    if (x == old) return res;
+    old = x, res = _euler(x);
     return res;
 }
 
@@ -70,31 +83,40 @@ int prime_divisors(int x) {
     return cnt;
 }
 
-// 原根. 返回原根个数
-int root[MAX];  // 原根
-int primitive_root(int modulo) {
-    int phi = euler(modulo);
-    int cnt_divisors = prime_divisors(phi);
-    int min_root = -1, cnt = 0;
+// 最小原根. 时间: O(modulo^0.25*log(modulo))
+int _min_root(int modulo) {
+    int cnt_divisors = prime_divisors(euler(modulo));
+    int res = -1, cnt = 0;
     for (int g = 1; g < modulo; g++) {
         if (__gcd(g, modulo) > 1) continue;
         bool flag = true;
         for (int i = 0; i < cnt_divisors; i++)
-            if (quick_pow(g, phi / divisors[i], modulo) == 1) {
+            if (quick_pow(g, euler(modulo) / divisors[i], modulo) == 1) {
                 flag = false;
                 break;
             }
         if (flag) {
-            min_root = g;  // 最小原根
+            res = g;
             break;
         }
     }
-    if (min_root == -1) return 0;
-    for (int x = 1, g = min_root; x <= phi; x++, g = g * min_root % modulo) {
-        if (__gcd(x, phi) == 1) {
+    return res;
+}
+inline int min_root(int modulo) {
+    static int old = -1, res = -1;
+    if (modulo == old) return res;
+    old = modulo, res = _min_root(modulo);
+    return res;
+}
+
+// 原根. 返回原根个数. 时间: O(euler(modulo))
+int root[MAX];  // 原根
+int primitive_root(int modulo) {
+    if (min_root(modulo) == -1) return 0;
+    int cnt = 0;
+    for (int x = 1, g = min_root(modulo); x <= euler(modulo); x++, g = g * min_root(modulo) % modulo)
+        if (__gcd(x, euler(modulo)) == 1)
             root[cnt++] = g;
-        }
-    }
     sort(root, root + cnt);
     return cnt;
 }

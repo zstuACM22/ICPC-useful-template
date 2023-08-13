@@ -16,7 +16,7 @@ int a[MAX];
 // 此单调队列自动分配索引
 int siz, now_id, m;
 int head, tail;
-pair<int, int> que[MAX];  // ASC
+pair<int, int> que[MAX];  // {index, value}, ASC
 
 // 初始化. mm: 滑块长度
 void init(int mm) {

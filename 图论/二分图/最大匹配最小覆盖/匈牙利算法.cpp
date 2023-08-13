@@ -13,7 +13,7 @@ const int MAX = 505;
 bool vis[MAX];
 int match[MAX];
 vector<int> edge[MAX];
-vector<int> left_node;
+vector<int> left_node;  // 左集点集合
 
 bool dfs(int x) {
     for (int y : edge[x]) {
@@ -28,12 +28,12 @@ bool dfs(int x) {
     return false;
 }
 
-// 匈牙利算法
+// 匈牙利算法, n 是右集点的个数.
 int hungarian(int n) {
     int res = 0;
-    fill(match, match + n, 0);
+    fill(match, match + n + 1, 0);
     for (int x : left_node) {
-        fill(vis, vis + n, false);
+        fill(vis, vis + n + 1, false);
         if (dfs(x))
             res++;
     }
