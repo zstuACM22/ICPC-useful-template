@@ -25,17 +25,10 @@ void init(int n) {
 
 // 状态合并方程  // Attention
 void state_merge(int x, int y) {
-    if (nodes[x] < nodes[y]) {
-        edges[y] += edges[x];
-        edges[x] = 0;  // 可不擦除
-        nodes[y] += nodes[x];
-        nodes[x] = 0;  // 可不擦除
-    } else {
-        edges[x] += edges[y];
-        edges[y] = 0;  // 可不擦除
-        nodes[x] += nodes[y];
-        nodes[y] = 0;  // 可不擦除
-    }
+    edges[y] += edges[x];
+    edges[x] = 0;  // 可不擦除
+    nodes[y] += nodes[x];
+    nodes[x] = 0;  // 可不擦除
 }
 
 // 返回根节点
@@ -52,7 +45,12 @@ bool merge(int x, int y) {
     edges[x]++;  // 新增边
     if (x == y)
         return false;
-    state_merge(x, y);
-    father[x] = y;
+    if (nodes[x] < nodes[y]) {
+        state_merge(x, y);
+        father[x] = y;
+    } else {
+        state_merge(y, x);
+        father[y] = x;
+    }
     return true;
 }
