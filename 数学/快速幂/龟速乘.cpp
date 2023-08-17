@@ -7,18 +7,16 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 龟速乘. 复杂度: O(log(multiplier))
+// 龟速乘 - Useless. 复杂度: O(log(multiplier))
 const int MOD = 1000000007;
 
-int slow_mul(int base, int multiplier) {
-    int res = 0;
-    while (multiplier) {
-        if (multiplier & 1)
-            res += base;
-        base += base;
-        multiplier >>= 1;
-    }
-    return res;
+// 用于解决 1e18 级别取模. 通常使用浮点乘更快
+// 考虑效率 __int128_t 快约 20%
+int float_mul(int x, int y, int modulo) {
+    int d = (long double)x / modulo * y + 0.5;
+    int r = x * y - d * modulo;
+    if (r < 0) r += modulo;
+    return r;
 }
 
 int slow_mul(int base, int multiplier, int modulo = MOD) {

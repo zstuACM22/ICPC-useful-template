@@ -25,12 +25,11 @@ void euler_linear(int n) {
         for (int j = 0; j < cnt and prime[j] * i <= n; j++) {
             vis[prime[j] * i] = true;
             if (i % prime[j] == 0) {
-                // 该语句在 prime[j] * i 访问共其 (总质因子数 - 不重复质因子数) 次.
                 euler[prime[j] * i] = euler[i] * prime[j];
                 break;
             }
-            // 该语句在 prime[j] * i 访问共其 不重复质因子数 次.
             euler[prime[j] * i] = euler[i] * (prime[j] - 1);
         }
     }
+    euler[1] = 0;
 }

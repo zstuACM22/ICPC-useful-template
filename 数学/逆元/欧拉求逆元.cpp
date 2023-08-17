@@ -25,6 +25,8 @@ int quick_pow(int base, int exponent) {
 
 // 欧拉函数
 int _euler(int x) {
+    if (x < 2)
+        return 0;
     int res = x;
     for (int i = 2; i <= x / i; i++)
         if (x % i == 0) {

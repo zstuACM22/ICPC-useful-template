@@ -24,6 +24,8 @@ int quick_pow(int base, int exponent) {
 
 // 欧拉函数. 求区间 [1, x] 中与 x 互质的数的个数. 复杂度: O(logx) -> O(x^0.5).
 int _euler(int x) {
+    if (x < 2)
+        return 0;
     int res = x;
     for (int i = 2; i <= x / i; i++)
         if (x % i == 0) {
@@ -45,10 +47,14 @@ inline int euler(int x) {
 // 扩展欧拉定理. 求 base ^ exponent = x (mod MOD). 复杂度: o(log(min(exponent, MOD)))
 // 用于处理 exponent 很大的幂数, 如 base ^ (a ^ b) = x (mod MOD)
 int exeuler(int base, int exponent) {
-    if (exponent < MOD)
-        return quick_pow(base, exponent);
-    else if (__gcd(base, MOD) == 1)
+    if (__gcd(base, MOD) == 1)
         return quick_pow(base, exponent % euler(MOD));
+    else if (exponent < euler(MOD))
+        return quick_pow(base, exponent);
     else
         return quick_pow(base, exponent % euler(MOD) + euler(MOD));
 }
+
+// 粗糙版扩展欧拉定理. 区别是没有降幂至最低.
+#define mm_ex(x) ((x) < euler(MOD) ? (x) : (x) % euler(MOD) + euler(MOD))
+int exeuler(int base, int exponent) { return quick_pow(base, mm_ex(exponent)); }

@@ -9,6 +9,8 @@ using namespace std;
 
 // 欧拉函数. 求区间 [1, x] 中与 x 互质的数的个数. 时间: O(logx) -> O(x^0.5).
 int _euler(int x) {
+    if (x < 2)
+        return 0;
     int res = x;
     for (int i = 2; i <= x / i; i++)
         if (x % i == 0) {

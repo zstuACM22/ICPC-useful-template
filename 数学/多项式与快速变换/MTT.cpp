@@ -34,8 +34,8 @@ template <int MOD>
 constexpr inline int inv(int primal) { return quick_pow<MOD>(primal, MOD - 2); }
 
 // 多模数 NTT 参数. 使用常量加速运算
-constexpr int NTT_MOD_1 = +469762049, NTT_MIN_ROOT_1 = 3, NTT_INV_ROOT_1 = inv<NTT_MOD_1>(NTT_MIN_ROOT_1);
-constexpr int NTT_MOD_2 = +998244353, NTT_MIN_ROOT_2 = 3, NTT_INV_ROOT_2 = inv<NTT_MOD_2>(NTT_MIN_ROOT_2);
+constexpr int NTT_MOD_1 =  469762049, NTT_MIN_ROOT_1 = 3, NTT_INV_ROOT_1 = inv<NTT_MOD_1>(NTT_MIN_ROOT_1);
+constexpr int NTT_MOD_2 =  998244353, NTT_MIN_ROOT_2 = 3, NTT_INV_ROOT_2 = inv<NTT_MOD_2>(NTT_MIN_ROOT_2);
 constexpr int NTT_MOD_3 = 1004535809, NTT_MIN_ROOT_3 = 3, NTT_INV_ROOT_3 = inv<NTT_MOD_3>(NTT_MIN_ROOT_3);
 constexpr __int128_t NTT_CRT_1 = (__int128_t)NTT_MOD_2 * NTT_MOD_3 * inv<NTT_MOD_1>(NTT_MOD_2 * NTT_MOD_3);
 constexpr __int128_t NTT_CRT_2 = (__int128_t)NTT_MOD_1 * NTT_MOD_3 * inv<NTT_MOD_2>(NTT_MOD_1 * NTT_MOD_3);
