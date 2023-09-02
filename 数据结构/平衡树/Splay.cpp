@@ -7,12 +7,12 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// Splay 平衡树
+// Splay
 const int MAX = 100005;
 const int INF = 0x3f3f3f3f3f3f3f3fll;
 
 // 代码实现约定:
-// tr[0].sum 始终为 0, tr[0] 其余随意; tr[root].father 始终为 0; root == 0 表示空树, next == 0 表示无儿子
+// tr[0].sum 始终为 0, 其余随意; tr[root].father 始终为 0; root == 0 表示空树, next == 0 表示无儿子
 struct Splay {
     int key;      // 键
     int cnt;      // 计数
