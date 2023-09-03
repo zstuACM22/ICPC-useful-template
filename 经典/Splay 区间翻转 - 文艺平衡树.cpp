@@ -59,11 +59,6 @@ struct Splay {
 int root = 0;
 int cnt_tr = 1;
 
-void clear() {
-    memset(tr, 0, sizeof(Splay) * cnt_tr);
-    cnt_tr = 1;
-}
-
 inline void up(int x) { tr[x].sum = tr[tr[x].next[0]].sum + tr[tr[x].next[1]].sum + 1; }
 
 inline void done(int x) {

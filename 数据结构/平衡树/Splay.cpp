@@ -25,6 +25,7 @@ int cnt_tr = 1;
 
 // 清空
 void clear() {
+    root = 0;
     memset(tr, 0, sizeof(Splay) * cnt_tr);
     cnt_tr = 1;
 }
@@ -65,7 +66,7 @@ typedef int iter;  // 索引, 避免与值混淆
 // 建树, 0-index. 时间: O(nlogn)
 int a[MAX];
 void build(int n) {
-    if (n == 0) 
+    if (n == 0)
         return;
     sort(a, a + n);  // 瓶颈
     int pre = -INF - 1;
@@ -202,63 +203,37 @@ void add(int x) {
 
 // 删除元素, 元素不存在返回 -1. 时间: O(logn)
 bool del(int x) {
-    // case 1: 空树
-    if (root == 0)
-        return false;
-    int idx = root;
-    while (true) {
-        if (x == tr[idx].key)
-            break;
-        // case 2: 元素不存在
-        if (tr[idx].next[x > tr[idx].key] == 0) {
-            splay(idx);
-            return false;
-        }
-        idx = tr[idx].next[x > tr[idx].key];
-    }
-    tr[idx].cnt--;
-    up(idx);
-    splay(idx);
-    // case 3: 无需移除点
-    if (tr[idx].cnt)
+    // case 1: 元素不存在 (同时 splay 为根)
+    if (find(x) == -1)
+        return -1;
+    tr[root].cnt--;
+    // case 2: 无需移除点
+    if (tr[root].cnt)
         return true;
-    // case 4: 移除后左子树为空
-    if (tr[idx].next[0] == 0) {
-        root = tr[idx].next[1];
+    // case 3: 移除后左子树为空
+    if (tr[root].next[0] == 0) {
+        root = tr[root].next[1];
         tr[root].father = 0;
         if (root)
             up(root);
         return true;
     }
-    // case 5: 移除后左子树非空
-    root = tr[idx].next[0];
+    // case 4: 移除后左子树非空
+    int ri = tr[root].next[1];
+    root = tr[root].next[0];
     tr[root].father = 0;
     maxi();
-    int s = tr[idx].next[1];
-    tr[root].next[1] = s;
-    tr[s].father = root;
+    tr[root].next[1] = ri;
+    tr[ri].father = root;
     up(root);
     return true;
 }
 
 // 元素 x 排名, x 不存在返回 -1. 1-index, 时间: O(logn)
 int rk(int x) {
-    if (root == 0)
+    if (find(x) == -1)
         return -1;
-    int idx = root, cnt = 0;
-    while (idx) {
-        if (x < tr[idx].key) {
-            idx = tr[idx].next[0];
-        } else {
-            cnt += tr[tr[idx].next[0]].sum;
-            if (x == tr[idx].key) {
-                splay(idx);
-                return cnt + 1;
-            }
-            idx = tr[idx].next[1];
-        }
-    }
-    return -1;
+    return tr[tr[root].next[0]].sum + 1;
 }
 
 // 排名 rk 索引, 总数不足 rk 返回 -1. 1-index, 时间: O(logn)
@@ -267,7 +242,7 @@ iter kth(int rk) {
         return -1;
     int idx = root, cnt = 0;
     while (true) {
-        if (tr[tr[idx].next[0]].sum >= rk) {
+        if (rk <= tr[tr[idx].next[0]].sum) {
             idx = tr[idx].next[0];
         } else {
             rk -= tr[tr[idx].next[0]].sum + tr[idx].cnt;
@@ -284,21 +259,18 @@ iter kth(int rk) {
 iter lower_bound(int x) {
     if (root == 0)
         return -1;
-    int idx = root;
-    while (true) {
-        if (x == tr[idx].key) {
-            splay(idx);
-            return idx;
-        }
-        if (tr[idx].next[x > tr[idx].key] == 0) {
-            splay(idx);
-            if (x < tr[idx].key)
-                return idx;
-            return nxt(idx);
-        }
-        idx = tr[idx].next[x > tr[idx].key];
-    }
+    find(x);
+    if (x <= tr[root].key)
+        return root;
+    return nxt(root);
 }
 
 // 第一个严格大于 x 的元素索引, 不存在返回 -1. 时间: O(logn)
-iter upper_bound(int x) { return lower_bound(x + 1); }
+iter upper_bound(int x) {
+    if (root == 0)
+        return -1;
+    find(x);
+    if (x < tr[root].key)
+        return root;
+    return nxt(root);
+}
