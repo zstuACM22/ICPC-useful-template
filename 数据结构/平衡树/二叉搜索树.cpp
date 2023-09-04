@@ -9,6 +9,7 @@ using namespace std;
 
 // 二叉搜索树
 const int MAX = 100005;
+const int INF = 0x3f3f3f3f3f3f3f3fll;
 
 // 代码实现约定:
 // tr[0].sum 始终为 0, 其余随意; tr[root].father 始终为 0; root == 0 表示空树, next == 0 表示无儿子
@@ -47,12 +48,39 @@ inline void maintain(int idx) {
 
 typedef int iter;
 
+// 建树, 将形成一棵平衡树, 0-index. 时间: O(nlogn)
+pair<int, int> a[MAX];  // {key, cnt}
+void build(int l, int r, int pre) {
+    if (l > r) return;
+    int nxt = cnt_tr++, mid = (l + r) / 2;
+    tr[pre].next[a[mid].first > tr[pre].key] = nxt;
+    tr[nxt].key = a[mid].first;
+    tr[nxt].cnt = a[mid].second;
+    tr[nxt].father = pre;
+    build(l, mid - 1, nxt);
+    build(mid + 1, r, nxt);
+    if (nxt) up(nxt);
+}
+void build(int n) {
+    if (n == 0) return;
+    sort(a, a + n);  // 瓶颈
+    int pre = -INF - 1, cnt = 0;
+    for (int i = 0; i < n; i++) {
+        if (a[i].first != pre) {
+            pre = a[i].first;
+            a[cnt++] = {pre, 0};
+        }
+        a[cnt - 1].second++;
+    }
+    build(0, cnt - 1, 0);
+    root = 1;
+}
+
 // 遍历. 时间: O(n)
 iter walk_list[MAX];
 int walk_cnt = 0;
 void walk(iter idx) {
-    if (idx == 0)
-        return;
+    if (idx == 0) return;
     walk(ls(idx));
     walk_list[walk_cnt++] = idx;
     walk(rs(idx));
