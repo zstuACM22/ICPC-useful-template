@@ -22,7 +22,7 @@ struct BT {
     int next[2];
 } tr[MAX];  // 二叉树
 #ifdef LOCAL
-#define DrawTreeNodeInfo(idx) ("{" + to_string(idx) + ", " + to_string(tr[idx].key) + "}")
+#define DrawTreeNodeInfo(idx) ("{" + to_string(tr[idx].key) + ", " + to_string(tr[idx].cnt) + "}")
 #define DrawTreeAdjacentList(idx) vector<int>(begin(tr[idx].next), end(tr[idx].next))
 class DrawTree {
     pair<string, int> p[MAX];
