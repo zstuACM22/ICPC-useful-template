@@ -74,7 +74,7 @@ inline void maintain(int idx) {
     }
 }
 
-typedef int iter;
+typedef int iter;  // 索引, 避免与值混淆
 
 // 建树, 建立平衡树, 0-index. 时间: O(nlogn)
 pair<int, int> a[MAX];  // {key, cnt}
