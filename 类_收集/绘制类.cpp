@@ -19,6 +19,7 @@ const int MAX = 100005;
 // 函数 DrawTreeAdjacentList(idx) 返回索引 idx 节点的邻接表用于搜索
 struct BT {
     int key;
+    int cnt;
     int next[2];
 } tr[MAX];  // 二叉树
 #ifdef LOCAL
