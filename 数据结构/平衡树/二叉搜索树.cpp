@@ -179,6 +179,7 @@ void add(int x) {
     }
 }
 
+// 删除索引, 直接删除索引而非计数 -1. 时间: O(logn)
 void del_idx(iter idx) {
     // case 1: idx 处在一条链 (没有左儿子) / idx 是叶子节点
     if (ls(idx) == 0) {
