@@ -7,6 +7,7 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
+#define LOCAL
 const int MAX = 100005;
 
 // 绘制类
@@ -23,6 +24,9 @@ struct BT {
 #define DrawTreeNodeInfo(idx) ("{" + to_string(idx) + ", " + to_string(tr[idx].key) + "}")
 #define DrawTreeAdjacentList(idx) vector<int>(begin(tr[idx].next), end(tr[idx].next))
 class DrawTree {
+#ifdef LOCAL
+#define DrawTreeEnable
+#endif
     pair<string, int> p[MAX];
     vector<int> all[MAX];
     int pos[MAX];
@@ -92,6 +96,7 @@ class DrawTree {
     string mapLeftRight[MAX];
 
    public:
+#ifdef DrawTreeEnable
     // 设置根节点
     DrawTree(int st) {
         walk(st, 0);
@@ -161,4 +166,9 @@ class DrawTree {
         cerr << setw((lim - 1) * blank + width + 2) << "" << endl;
         cerr << setfill(' ');
     }
+#else
+    DrawTree(int st) {}
+    void drawTopDown() {}
+    void drawLeftRight() {}
+#endif
 };
