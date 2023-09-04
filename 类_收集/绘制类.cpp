@@ -21,12 +21,10 @@ struct BT {
     int key;
     int next[2];
 } tr[MAX];  // 二叉树
+#ifdef LOCAL
 #define DrawTreeNodeInfo(idx) ("{" + to_string(idx) + ", " + to_string(tr[idx].key) + "}")
 #define DrawTreeAdjacentList(idx) vector<int>(begin(tr[idx].next), end(tr[idx].next))
 class DrawTree {
-#ifdef LOCAL
-#define DrawTreeEnable
-#endif
     pair<string, int> p[MAX];
     vector<int> all[MAX];
     int pos[MAX];
@@ -96,7 +94,6 @@ class DrawTree {
     string mapLeftRight[MAX];
 
    public:
-#ifdef DrawTreeEnable
     // 设置根节点
     DrawTree(int st) {
         walk(st, 0);
@@ -166,9 +163,12 @@ class DrawTree {
         cerr << setw((lim - 1) * blank + width + 2) << "" << endl;
         cerr << setfill(' ');
     }
+};
 #else
+class DrawTree {
+   public:
     DrawTree(int st) {}
     void drawTopDown() {}
     void drawLeftRight() {}
-#endif
 };
+#endif
