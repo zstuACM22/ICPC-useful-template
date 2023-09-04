@@ -91,9 +91,11 @@ void build(int n) {
 iter walk_list[MAX];
 int walk_cnt = 0;
 void walk(iter idx) {
-    if (tr[idx].next[0]) walk(tr[idx].next[0]);
+    if (idx == 0) 
+        return;
+    walk(tr[idx].next[0]);
     walk_list[walk_cnt++] = idx;
-    if (tr[idx].next[1]) walk(tr[idx].next[1]);
+    walk(tr[idx].next[1]);
 }
 
 // 元素索引, 元素不存在返回 -1. 时间: O(logn)

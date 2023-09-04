@@ -130,10 +130,12 @@ void build(int n) {
 
 vector<int> out;
 void walk(int idx) {
+    if (idx == 0)
+        return;
     done(idx);
-    if (tr[idx].next[0]) walk(tr[idx].next[0]);
+    walk(tr[idx].next[0]);
     out.push_back(idx - 1);
-    if (tr[idx].next[1]) walk(tr[idx].next[1]);
+    walk(tr[idx].next[1]);
 }
 
 void solve() {
