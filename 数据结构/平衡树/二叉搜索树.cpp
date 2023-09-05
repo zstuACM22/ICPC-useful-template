@@ -32,7 +32,7 @@ int root = 0;
 void clear() {
     root = 0;
     memset(tr, 0, sizeof(BST) * cnt_tr);
-    cnt_tr = 0;
+    cnt_tr = 1;
 }
 
 // 维护子树求和 (单步)

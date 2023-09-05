@@ -33,7 +33,7 @@ int root = 0;
 void clear() {
     root = 0;
     memset(tr, 0, sizeof(AVL) * cnt_tr);
-    cnt_tr = 0;
+    cnt_tr = 1;
 }
 
 // 维护子树求和. x != 0
@@ -91,7 +91,7 @@ void build(int l, int r, int pre) {
 }
 void build(int n) {
     if (n == 0) return;
-    sort(a, a + n);
+    sort(a, a + n);  // 瓶颈
     int pre = -INF - 1, cnt = 0;
     for (int i = 0; i < n; i++) {
         if (a[i].first != pre) {
