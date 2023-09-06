@@ -46,11 +46,11 @@ inline void up(int idx) {
 inline void rotate(int &x, bool w) {
     int f = fa(x), s = tr[x].next[w], ss = tr[s].next[not w];
     tr[f].next[who(x)] = s;
-    tr[s].father = f;
+    fa(s) = f;
     tr[x].next[w] = ss;
-    tr[ss].father = x;
+    fa(ss) = x;
     tr[s].next[not w] = x;
-    tr[x].father = s;
+    fa(x) = s;
     swap(x, s);
     up(s);
     up(x);
@@ -84,7 +84,7 @@ void build(int l, int r, int pre) {
     tr[pre].next[a[mid].first > tr[pre].key] = nxt;
     tr[nxt].key = a[mid].first;
     tr[nxt].cnt = a[mid].second;
-    tr[nxt].father = pre;
+    fa(nxt) = pre;
     build(l, mid - 1, nxt);
     build(mid + 1, r, nxt);
     if (nxt) up(nxt);
@@ -181,7 +181,7 @@ void add(int x) {
         int nxt = cnt_tr++;
         tr[nxt].key = x;
         tr[nxt].cnt = 1;
-        tr[nxt].father = 0;
+        fa(nxt) = 0;
         root = nxt;
         maintain(nxt);
         return;
@@ -200,7 +200,7 @@ void add(int x) {
             tr[idx].next[x > tr[idx].key] = nxt;
             tr[nxt].key = x;
             tr[nxt].cnt = 1;
-            tr[nxt].father = idx;
+            fa(nxt) = idx;
             maintain(nxt);
             return;
         }
@@ -213,7 +213,7 @@ void del_idx(iter idx) {
     // case 1: idx 处在一条链 (没有左儿子) / idx 是叶子节点
     if (ls(idx) == 0) {
         tr[fa(idx)].next[who(idx)] = rs(idx);
-        tr[rs(idx)].father = fa(idx);
+        fa(rs(idx)) = fa(idx);
         if (fa(idx) == 0)
             root = rs(idx);
         maintain(fa(idx));
@@ -222,19 +222,29 @@ void del_idx(iter idx) {
     // case 2: idx 处在一条链 (没有右儿子)
     if (rs(idx) == 0) {
         tr[fa(idx)].next[who(idx)] = ls(idx);
-        tr[ls(idx)].father = fa(idx);
+        fa(ls(idx)) = fa(idx);
         if (fa(idx) == 0)
             root = ls(idx);
         maintain(fa(idx));
         return;
     }
     // case 3: 否则, 寻找后继交换后删除
-    int pre = idx;
-    idx = rs(idx);
-    while (ls(idx))
-        idx = ls(idx);
-    tr[pre].key = tr[idx].key;
-    tr[pre].cnt = tr[idx].cnt;
+    int nxt = rs(idx);
+    while (ls(nxt)) {
+        nxt = ls(nxt);
+    }
+    // 交换两点
+    tr[fa(idx)].next[who(idx)] = nxt;
+    fa(ls(idx)) = nxt;
+    fa(rs(nxt)) = idx;
+    int &tmp = tr[fa(nxt)].next[who(nxt)];
+    fa(rs(idx)) = nxt;
+    tmp = idx;
+    swap(fa(idx), fa(nxt));
+    swap(ls(idx), ls(nxt));
+    swap(rs(idx), rs(nxt));
+    if (root == idx)
+        root = nxt;
     del_idx(idx);
 }
 
