@@ -203,7 +203,7 @@ void add(int x) {
     }
 }
 
-// 删除元素, 元素不存在返回 -1. 时间: O(logn)
+// 删除元素, 元素不存在返回 false. 时间: O(logn)
 bool del(int x) {
     // case 1: 元素不存在 (同时 splay 为根)
     if (find(x) == -1)

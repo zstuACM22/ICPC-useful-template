@@ -219,7 +219,7 @@ void del_idx(iter idx) {
     del_idx(idx);
 }
 
-// 删除元素, 元素不存在返回 -1. 时间: O(logn)
+// 删除元素, 元素不存在返回 false. 时间: O(logn)
 bool del(int x) {
     // case 1: 元素不存在
     if (root == 0)
