@@ -66,8 +66,7 @@ typedef int iter;  // 索引, 避免与值混淆
 // 建树, 0-index. 时间: O(nlogn)
 int a[MAX];
 void build(int n) {
-    if (n == 0)
-        return;
+    if (n == 0) return;
     sort(a, a + n);  // 瓶颈
     int pre = -INF - 1;
     for (int i = 0; i < n; i++) {
@@ -91,8 +90,7 @@ void build(int n) {
 iter walk_list[MAX];
 int walk_cnt = 0;
 void walk(iter idx) {
-    if (idx == 0) 
-        return;
+    if (idx == 0) return;
     walk(tr[idx].next[0]);
     walk_list[walk_cnt++] = idx;
     walk(tr[idx].next[1]);

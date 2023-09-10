@@ -230,9 +230,8 @@ void del_idx(iter idx) {
     }
     // case 3: 否则, 寻找后继交换后删除
     int nxt = rs(idx);
-    while (ls(nxt)) {
+    while (ls(nxt))
         nxt = ls(nxt);
-    }
     // 交换两点
     tr[fa(idx)].next[who(idx)] = nxt;
     fa(ls(idx)) = nxt;
