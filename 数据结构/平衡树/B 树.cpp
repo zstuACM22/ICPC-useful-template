@@ -9,6 +9,7 @@ using namespace std;
 
 // B 树 - Useless
 // B 树适用于高频磁盘访问, 如数据库
+// 由于 B 树未保证索引与键是静态绑定的, 所有对外接口均不返回索引
 const int MAX = 100005;
 
 // 代码实现约定:
