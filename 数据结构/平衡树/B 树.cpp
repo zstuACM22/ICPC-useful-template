@@ -31,9 +31,6 @@ struct BTree {
 int cnt_tr = 1;
 int root = 0;
 
-#define fa(idx) tr[idx].father            // 父节点
-#define leaf(idx) (tr[idx].next[0] == 0)  // 是否为叶子节点
-
 // 清空
 void clear() {
     root = 0;
@@ -55,7 +52,7 @@ inline void up(int idx) {
 inline void maintain(int idx) {
     while (idx) {
         up(idx);
-        idx = fa(idx);
+        idx = tr[idx].father;
     }
 }
 
@@ -70,7 +67,7 @@ inline int find_key(int idx, int x) {
 
 // 向下查找一步, 查找结束返回 {true, 第一个大于等于的键索引}, 否则返回 {false, 下一个节点索引}
 inline pair<bool, int> find_next(int idx, int x) {
-    if (leaf(idx))  // case 1: 当前节点为叶子节点
+    if (tr[idx].next[0] == 0)  // case 1: 当前节点为叶子节点
         return {true, find_key(idx, x)};
     for (int i = 0; i < tr[idx].keys; i++) {
         if (x == tr[idx].pair[i].key)
@@ -83,49 +80,45 @@ inline pair<bool, int> find_next(int idx, int x) {
 
 // 插入键及其左儿子
 inline void add_key_and_left_son(int idx, int pos, const Pair &p, int nxt) {
-    int keys = tr[idx].keys;
+    int keys = tr[idx].keys++;
     memmove(tr[idx].pair + pos + 1, tr[idx].pair + pos, sizeof(Pair) * (keys - pos));
     memmove(tr[idx].next + pos + 1, tr[idx].next + pos, sizeof(int) * (keys - pos + 1));
     tr[idx].pair[pos] = p;
     tr[idx].next[pos] = nxt;
-    fa(nxt) = idx;
-    tr[idx].keys++;
+    tr[nxt].father = idx;
 }
 
 // 插入键及其右儿子
 inline void add_key_and_right_son(int idx, int pos, const Pair &p, int nxt) {
-    int keys = tr[idx].keys;
+    int keys = tr[idx].keys++;
     memmove(tr[idx].pair + pos + 1, tr[idx].pair + pos, sizeof(Pair) * (keys - pos));
     memmove(tr[idx].next + pos + 2, tr[idx].next + pos + 1, sizeof(int) * (keys - pos));
     tr[idx].pair[pos] = p;
     tr[idx].next[pos + 1] = nxt;
-    fa(nxt) = idx;
-    tr[idx].keys++;
+    tr[nxt].father = idx;
 }
 
 // 删除键及其左儿子
 inline void del_key_and_left_son(int idx, int pos) {
-    int keys = tr[idx].keys;
+    int keys = tr[idx].keys--;
     memmove(tr[idx].pair + pos, tr[idx].pair + pos + 1, sizeof(Pair) * (keys - pos - 1));
     memmove(tr[idx].next + pos, tr[idx].next + pos + 1, sizeof(int) * (keys - pos));
-    tr[idx].keys--;
 }
 
 // 删除键及其右儿子
 inline void del_key_and_right_son(int idx, int pos) {
-    int keys = tr[idx].keys;
+    int keys = tr[idx].keys--;
     memmove(tr[idx].pair + pos, tr[idx].pair + pos + 1, sizeof(Pair) * (keys - pos - 1));
     memmove(tr[idx].next + pos + 1, tr[idx].next + pos + 2, sizeof(int) * (keys - pos - 1));
-    tr[idx].keys--;
 }
 
 // 将该节点所有子节点父节点设为 f
 inline void reset_father(int idx, int f) {
     for (int i = tr[idx].keys; i >= 0; i--)
-        fa(tr[idx].next[i]) = f;
+        tr[tr[idx].next[i]].father = f;
 }
 
-// 元素索引, 找打元素返回 {true, {key, cnt}}, 否则返回 {false, any}. 时间: O(logn)
+// 元素索引, 找到元素返回 {true, {key, cnt}}, 否则返回 {false, any}. 时间: O(logn)
 pair<bool, Pair> find(int x) {
     if (root == 0)
         return {false, {}};
@@ -148,15 +141,15 @@ void maintain_add(int idx) {
     // case 2: 不满足约束且没有父节点, 需要新建父节点, 然后继续 case 3
     if (idx == root) {
         int nxt = cnt_tr++;
-        fa(idx) = nxt;
+        tr[idx].father = nxt;
         tr[nxt].next[0] = idx;
-        fa(nxt) = 0;
+        tr[nxt].father = 0;
         root = nxt;
     }
     // case 3: 不满足约束, 中位数向父键插入, 左右分裂为两个节点, 作父键左右儿子
-    int f = fa(idx), nxt = cnt_tr++, siz = tr[idx].keys, pos = siz / 2;
+    int f = tr[idx].father, nxt = cnt_tr++, siz = tr[idx].keys, pos = siz / 2;
     add_key_and_right_son(f, find_key(f, tr[idx].pair[0].key), tr[idx].pair[pos], nxt);
-    fa(nxt) = f;
+    tr[nxt].father = f;
     memcpy(tr[nxt].pair, tr[idx].pair + pos + 1, sizeof(Pair) * (siz - pos - 1));
     memcpy(tr[nxt].next, tr[idx].next + pos + 1, sizeof(int) * (siz - pos));
     tr[idx].keys = pos;
@@ -171,7 +164,7 @@ void add(int x) {
     if (root == 0) {
         int nxt = cnt_tr++;
         add_key_and_right_son(nxt, 0, {x, 1}, 0);
-        fa(nxt) = 0;
+        tr[nxt].father = 0;
         root = nxt;
         up(root);
         return;
@@ -201,7 +194,7 @@ void maintain_del(int idx) {
     if (idx == root) {
         if (tr[root].keys == 0)
             root = tr[idx].next[0];
-        fa(root) = 0;
+        tr[root].father = 0;
         up(root);
         return;
     }
@@ -210,7 +203,7 @@ void maintain_del(int idx) {
         maintain(idx);
         return;
     }
-    int f = fa(idx), w = find_key(f, tr[idx].pair[0].key), siz = tr[idx].keys;
+    int f = tr[idx].father, w = find_key(f, tr[idx].pair[0].key), siz = tr[idx].keys;
     int lb = w > 0 ? tr[f].next[w - 1] : 0, slb = tr[lb].keys;
     int rb = w < tr[f].keys ? tr[f].next[w + 1] : 0, srb = tr[rb].keys;
     // case 3: 从左或右兄弟移动一节点到当前节点, 左右兄弟依然满足约束
@@ -267,7 +260,7 @@ bool del(int x) {
                 return true;
             }
             // case 4: 需要删除键
-            if (leaf(idx)) {
+            if (tr[idx].next[0] == 0) {
                 // subcase 1: 如为叶子节点, 删除后维护
                 del_key_and_left_son(idx, p.second);
             } else {
@@ -291,7 +284,7 @@ pair<bool, Pair> mini() {
     if (root == 0)
         return {false, {}};
     int idx = root;
-    while (not leaf(idx))
+    while (tr[idx].next[0])
         idx = tr[idx].next[0];
     return {true, tr[idx].pair[0]};
 }
@@ -301,7 +294,7 @@ pair<bool, Pair> maxi() {
     if (root == 0)
         return {false, {}};
     int idx = root;
-    while (not leaf(idx))
+    while (tr[idx].next[0])
         idx = tr[idx].next[tr[idx].keys];
     return {true, tr[idx].pair[tr[idx].keys - 1]};
 }
@@ -314,17 +307,17 @@ pair<bool, Pair> pre(int x) {
     while (true) {
         pair<bool, int> p = find_next(idx, x);
         if (p.first) {
-            if (leaf(idx)) {
+            if (tr[idx].next[0] == 0) {
                 while (idx) {
                     int w = find_key(idx, x);
                     if (w)
                         return {true, tr[idx].pair[w - 1]};
-                    idx = fa(idx);
+                    idx = tr[idx].father;
                 }
                 return {false, {}};
             } else {
                 idx = tr[idx].next[p.second];
-                while (not leaf(idx))
+                while (tr[idx].next[0])
                     idx = tr[idx].next[tr[idx].keys];
                 return {true, tr[idx].pair[tr[idx].keys - 1]};
             }
@@ -346,7 +339,7 @@ pair<bool, Pair> nxt_or_equal(int x) {
                 int w = find_key(idx, x);
                 if (w < tr[idx].keys)
                     return {true, tr[idx].pair[w]};
-                idx = fa(idx);
+                idx = tr[idx].father;
             }
             return {false, {}};
         }
