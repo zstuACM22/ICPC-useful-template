@@ -6,7 +6,7 @@
 #define endl '\n'
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
-
+ 
 #define MAXSIZE (1ull << 10)
 char buf[MAXSIZE], *p1 = nullptr, *p2 = nullptr;
 #define isdigit(c) ('0' <= (c) and (c) <= '9')

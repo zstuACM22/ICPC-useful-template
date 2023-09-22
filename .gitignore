@@ -1,5 +1,5 @@
 .*
-test.*
+*.exe
 in.*
 out.*
 *.in
