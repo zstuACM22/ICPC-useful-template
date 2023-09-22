@@ -19,13 +19,16 @@ class IO {
     char buf[MAXSIZE], *p1, *p2;
     char pbuf[MAXSIZE], *pp;
     bool eof = false;
+
 #ifdef LOCAL
 #else
-    IO() : p1(buf), p2(buf), pp(pbuf) {
-    }
+    IO() : p1(buf), p2(buf), pp(pbuf) {}
 
     ~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
 #endif
+
+    friend IO &operator>>(IO &io, )
+
     inline char gc() {
 #ifdef LOCAL  // 调试，可显示字符
         return getchar();
@@ -37,6 +40,16 @@ class IO {
             return ' ';
         }
         return *p1++;
+#endif
+    }
+
+    inline void push(const char &c) {
+#ifdef LOCAL  // 调试，可显示字符
+        putchar(c);
+#else
+        if (pp - pbuf == MAXSIZE)
+            fwrite(pbuf, 1, MAXSIZE, stdout), pp = pbuf;
+        *pp++ = c;
 #endif
     }
 
@@ -80,16 +93,6 @@ class IO {
         for (; isblank(c); c = gc())
             ;
         return not eof;
-    }
-
-    inline void push(const char &c) {
-#ifdef LOCAL  // 调试，可显示字符
-        putchar(c);
-#else
-        if (pp - pbuf == MAXSIZE)
-            fwrite(pbuf, 1, MAXSIZE, stdout), pp = pbuf;
-        *pp++ = c;
-#endif
     }
 
     template <class T>
