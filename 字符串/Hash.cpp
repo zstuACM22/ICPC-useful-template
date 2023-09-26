@@ -4,7 +4,7 @@
 #include <bits/stdc++.h>
 #define int int64_t
 #define endl '\n'
-#pragma GCC optimize(3, "Ofast", "inline")
+// #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
 // 字符串哈希
@@ -13,8 +13,9 @@ const int MAX = 1000005;
 #define HASH_DOUBLE  // 启用双模数哈希
 // #define HASH_NATURE  // 启用自然溢出哈希
 // #define HASH_RANDOM  // 启用随机哈希因子
-// #define HASH_REV     // 启用逆序哈希, 用于回文判定
+#define HASH_REV     // 启用逆序哈希, 用于回文判定
 
+// 提取 h2
 #ifdef HASH_DOUBLE
 const int MASK = (1ull << 32) - 1;
 #endif
@@ -74,7 +75,6 @@ void hash_init(int n) {
 #endif
     }
 }
-
 // 字符串哈希初始化
 void hash_it(const char *s, int n) {
     h1[0] = 0;
@@ -100,9 +100,9 @@ void hash_it(const char *s, int n) {
     }
 #endif
 }
-
 // 截取子串哈希. 0-index, 左闭右闭
-HashCode hash_sub(int l, int r, bool reverse = false) {
+template<bool reverse = false>
+HashCode hash_sub(int l, int r) {
 #ifdef HASH_REV
     if (reverse) {
         int s1 = mm2(g1[l + 1] - g1[r + 2] * p1[r - l + 1], M1);
@@ -122,7 +122,6 @@ HashCode hash_sub(int l, int r, bool reverse = false) {
     return {s1, r - l + 1};
 #endif
 }
-
 // 连接子串哈希
 HashCode hash_join(HashCode lhc, HashCode rhc) {
 #ifdef HASH_DOUBLE
@@ -140,10 +139,9 @@ HashCode hash_join(HashCode lhc, HashCode rhc) {
     return {s1, llen + rlen};
 #endif
 }
-
 // 判断回文
 #ifdef HASH_REV
 bool is_palindrome(int l, int r) {
-    return hash_sub(l, r) == hash_sub(l, r, true);
+    return hash_sub(l, r) == hash_sub<true>(l, r);
 }
 #endif
