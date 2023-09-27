@@ -14,7 +14,7 @@ const int MAX = 1000005;
 // #define HASH_NATURE  // 启用自然溢出哈希
 // #define HASH_RANDOM  // 启用随机哈希因子
 #define HASH_REV     // 启用逆序哈希, 用于回文判定
-// #define HASH_JOIN_ON // 启用 hash_join
+// #define HASH_JOIN // 启用 hash_join
 
 // 提取 h2
 #ifdef HASH_DOUBLE
@@ -53,7 +53,7 @@ int g2[MAX];
 #endif
 #endif
 
-#ifdef HASH_JOIN_ON
+#ifdef HASH_JOIN
 typedef pair<int, int> HashCode;  // {HashCode, HashLength}
 #define hc(x, len) {(x), (len)}
 #else
@@ -84,7 +84,7 @@ int hash_init = []() {
     return 1;
 } ();
 // 只对字符串整体哈希，返回 int
-inline int whole_hash_only(const char *s, int n) {
+inline int hash_code(const char *s, int n) {
     int sum1 = 0;
 #ifdef HASH_DOUBLE
     int sum2 = 0;
@@ -149,7 +149,7 @@ inline HashCode hash_sub(int l, int r) {
 #endif
 }
 // 连接子串哈希
-#ifdef HASH_JOIN_ON
+#ifdef HASH_JOIN
 inline HashCode hash_join(HashCode lhc, HashCode rhc) {
 #ifdef HASH_DOUBLE
     int lh1 = lhc.first >> 32, lh2 = lhc.first & MASK, llen = lhc.second;
