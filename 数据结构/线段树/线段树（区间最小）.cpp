@@ -3,7 +3,7 @@
 using namespace std;
 #define psi pair<string, int>
 const int N = 1e5 + 10, MULTITEST = 0, inf = 1e18;
-// 线段树（区间取 max，求区间最大）
+// 线段树（区间取 min，求区间最小）
 
 class segment_tree_min {
    public: 
