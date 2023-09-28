@@ -28,9 +28,9 @@ inline int manacher(string &s) {
 ////////// 类 manacher 修改下行的回文串判断条件
         while (ch[i - p[i]] == ch[i + p[i]]) ++p[i];
         --p[i];
-        if (i + p[i] > r) { r = i + p[i], mid = i; }  // 更新最长回文串，长度是 p[i]，其中心位置是 i
-        if (p[i] > ans) ans = p[i];                   // 统计回文串数量
-        // num += p[i] / 2;
+        if (i + p[i] > r) { r = i + p[i], mid = i; }  
+        if (p[i] > ans) ans = p[i];  // 更新最长回文串，长度是 p[i]，其中心位置是 i
+        // num += p[i] / 2;          // 统计回文串数量
     }
     return ans;
 }
