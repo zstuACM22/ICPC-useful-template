@@ -40,5 +40,5 @@ int longest_palindrome(int i, bool is_odd) {
 }
 // 判断原串的 [l, r] 是否为回文串. 0-index, 左闭右闭
 bool is_palindrome(int l, int r) {
-    return p[l * 2 + r * 2 + 5] >= r - l + 1;
+    return p[l + r + 2] >= r - l + 1;
 }
