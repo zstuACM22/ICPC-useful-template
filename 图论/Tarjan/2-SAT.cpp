@@ -11,7 +11,7 @@ const int MAX = 1000005;
 
 // 2-SAT 二元适定性问题
 // 需要首先将其转换为 {vertex, bool} -> {vertex, bool} (如果前者成立，后者一定成立条件作为边的有向图) 的问题
-// 例如: not (A and B) ==> A -> not B, B -> not A; A or B ==> not A -> B, not B --> A
+// 例如: not (A and B) ==> A -> not B, B -> not A; A or B ==> not A -> B, not B -> A
 vector<int> edge[MAX];
 
 bool in_stk[MAX << 1];
