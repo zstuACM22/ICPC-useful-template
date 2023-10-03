@@ -8,7 +8,8 @@
 using namespace std;
 
 // 跳表 - Useless
-// 跳表并非平衡树但功能相似, 基于链表. 通过多层随机跳跃, 可以实现与平衡树相似的时空复杂度. 相比于平衡树, 其具有代码量小的优势.
+// 跳表并非平衡树但功能相似, 基于链表. 通过多层随机跳跃, 可以实现与平衡树相似的时空复杂度. 
+// 相比于平衡树, 其具有代码量小的优势, 但由于必须使用 STL vector 性能一般.
 const int MAX = 100005;
 const int INF = 0x3f3f3f3f3f3f3f3fll;
 const int MAX_DEPTH = 18;
