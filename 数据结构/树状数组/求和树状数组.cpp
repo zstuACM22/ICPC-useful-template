@@ -18,7 +18,7 @@ int tr[MAX] = {0};  // 1-index
 
 int s[MAX];
 // 建树. 时间: O(n)
-void build() {
+inline void build() {
     s[0] = 0;
     for (int i = 1; i <= n; i++)
         s[i] = s[i - 1] + a[i];
@@ -27,13 +27,13 @@ void build() {
 }
 
 // 单点修改. 时间: O(logn)
-void add(int idx, int x) {
+inline void add(int idx, int x) {
     for (; idx <= n; idx += lowbit(idx))
         tr[idx] += x;
 }
 
 // 区间查询. 时间: O(logn)
-int query(int l, int r) {
+inline int query(int l, int r) {
     int x = 0;
     for (; r; r -= lowbit(r))
         x += tr[r];

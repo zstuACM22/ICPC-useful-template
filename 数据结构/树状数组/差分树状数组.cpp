@@ -17,13 +17,13 @@ int tr[MAX] = {0};  // 1-index
 #define lowbit(x) ((x) & -(x))
 
 // 建树. 时间: O(n)
-void build() {
+inline void build() {
     for (int i = 1; i <= n; i++)
         tr[i] = a[i] - a[i - lowbit(i)];
 }
 
 // 单点修改. 时间: O(logn)
-void add(int l, int r, int x) {
+inline void add(int l, int r, int x) {
     for (; l <= n; l += lowbit(l))
         tr[l] += x;
     for (r++; r <= n; r += lowbit(r))
@@ -31,7 +31,7 @@ void add(int l, int r, int x) {
 }
 
 // 区间查询. 时间: O(logn)
-int query(int idx) {
+inline int query(int idx) {
     int x = 0;
     for (; idx; idx -= lowbit(idx))
         x += tr[idx];

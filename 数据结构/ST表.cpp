@@ -16,13 +16,13 @@ int lg2[MAX];
 int a[MAX];
 int st[MAX][LOG];
 
-void load_lg2(int n) {
+inline void load_lg2(int n) {
     lg2[0] = -1;
     for (int i = 1; i <= n; i++)
         lg2[i] = lg2[i >> 1] + 1;
 }
 
-void build(int n) {
+inline void build(int n) {
     for (int i = 1; i <= n; i++)
         st[i][0] = a[i];
     for (int j = 1, v = 1; v < n; j++, v <<= 1)
@@ -30,7 +30,7 @@ void build(int n) {
             st[i][j] = max(st[i][j - 1], st[min(i + v, n)][j - 1]);  // Attention
 }
 
-int query(int l, int r) {
+inline int query(int l, int r) {
     int u = lg2[r - l + 1];
     return max(st[l][u], st[r - (1 << u) + 1][u]);  // Attention
 }
