@@ -62,7 +62,7 @@ void add_point(int x, int y) {
 #endif
 }
 
-// 解决所有询问
+// 解决所有询问, 对于每个点求从原点到该点的最长偏序 (不含原点)
 int resP[MAXN];  // 依次存储每次询问的答案, 0-index
 void count_all() {
     sort(P, P + cntP);
