@@ -8,6 +8,7 @@
 using namespace std;
 
 // 三维数点. 时间: O(nlognlogn), 空间: O(n)
+// 离线询问三维空间 {(i, j, k) | 0 <= i <= x and 0 <= j <= y and 0 <= k <= z} 中点的个数
 // 如果要将询问由前缀改区间, 别忘改空间大小
 const int MAXN = 100005;
 const int MAXD = 10000005;

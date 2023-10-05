@@ -7,6 +7,8 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
+// 二维最长偏序. 时间: O(nlogn), 空间: O(n)
+// 计算二维平面中以每点结束的最长偏序, 要求不存在重合点
 const int MAXN = 100005;
 const int MAXD = 10000005;
 

@@ -7,6 +7,8 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
+// 二维数点. 时间: O(nlogn), 空间: O(n)
+// 离线询问二维平面 {(i, j) | x <= i <= xx and y <= j <= yy} 中点的个数
 const int MAXN = 100005;
 const int MAXD = 10000005;
 
