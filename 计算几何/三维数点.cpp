@@ -94,6 +94,14 @@ inline void merge_sort() {
 }
 }  // namespace MS
 
+// 重置
+inline void clear() {
+    memset(resQ, 0, sizeof(int) * cntQ);
+    cntP = 0;
+    cntQ = 0;
+    cntZ = 0;
+}
+
 // 在三维空间加入计数点 (x, y, z)
 inline void add_point(int x, int y, int z) {
     P[cntP++] = {x, y, z, false, 0};

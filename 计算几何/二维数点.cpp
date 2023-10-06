@@ -59,6 +59,17 @@ inline int query(int idx) {
 int resQ[MAXN];
 int cntQ = 0;
 
+// 重置
+inline void clear() {
+    for (int i = 0; i < cntP; i++)
+        if (not P[i].query)
+            add(arcY(P[i].y) + 1, -P[i].wi);
+    memset(resQ, 0, sizeof(int) * cntQ);
+    cntP = 0;
+    cntQ = 0;
+    cntY = 0;
+}
+
 // 在二维平面加入计数点 (x, y)
 inline void add_point(int x, int y, int w = 1) {
     P[cntP++] = {x, y, false, w};

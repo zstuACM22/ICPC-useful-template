@@ -42,19 +42,32 @@ int tr[MAXN];
 int tr[MAXD];
 #endif
 #define lowbit(x) ((x) & -(x))
-void add(int idx, int x) {
+inline void reset(int idx) {
+    for (; idx <= cntY; idx += lowbit(idx))
+        tr[idx] = 0;
+}
+inline void setmax(int idx, int x) {
     for (; idx <= cntY; idx += lowbit(idx))
         tr[idx] = max(tr[idx], x);
 }
-int query(int idx) {
+inline int query(int idx) {
     int res = 0;
     for (; idx; idx -= lowbit(idx))
         res = max(res, tr[idx]);
     return res;
 }
 
+// 重置
+inline void clear() {
+    for (int i = 0; i < cntP; i++)
+        reset(arcY(P[i].y) + 1);
+    memset(resP, 0, sizeof(int) * cntP);
+    cntP = 0;
+    cntY = 0;
+}
+
 // 在二维平面加入点 (x, y)
-void add_point(int x, int y) {
+inline void add_point(int x, int y) {
     P[cntP] = {x, y, cntP};
     cntP++;
 #ifdef DIS_Y
@@ -66,7 +79,7 @@ void add_point(int x, int y) {
 
 // 解决所有询问, 对于每个点求从原点到该点的最长偏序 (不含原点)
 int resP[MAXN];  // 依次存储每次询问的答案, 0-index
-void count_all() {
+inline void count_all() {
     sort(P, P + cntP);
 #ifdef DIS_Y
     sort(Y, Y + cntY);
@@ -74,7 +87,7 @@ void count_all() {
 #endif
     for (int i = 0; i < cntP; i++) {
         int idx = arcY(P[i].y) + 1, x = query(idx) + 1;
-        add(idx, x);
+        setmax(idx, x);
         resP[P[i].idx] = x;
     }
 }
