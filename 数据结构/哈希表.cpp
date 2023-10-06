@@ -22,26 +22,29 @@ class Hash_Table {
     int Hash_code(int x) {
         return x & MASK;
     }
- 
+
    public:
+    // 插入成功返回 true，否则返回 false，实参填入 idx 则不会再次调用 find 函数查找
 #ifdef VALUE
-    bool insert(const int &x, const int &v)
+    bool insert(const int &x, const int &v, int idx = -1)
 #else
-    bool insert(const int &x)
+    bool insert(const int &x, int idx = -1)
 #endif
     {
-        int ret = find(x);
+        int ret = idx == -1 ? find(x) : idx;
         if (ret) return false;
-        int idx = Hash_code(x);
+        int cur_key = Hash_code(x);
         ++tot;
         key[tot] = x;
-        next[tot] = head[idx];
-        head[idx] = tot;
+        next[tot] = head[cur_key];
+        head[cur_key] = tot;
 #ifdef VALUE
         val[tot] = v;
 #endif
         return true;
     }
+
+    // 找到返回 idx，没找到返回 0
     int find(int x) {
         int cur_key = Hash_code(x);
         for (int i = head[cur_key]; i; i = next[i]) {
@@ -50,4 +53,4 @@ class Hash_Table {
         return 0;
     }
 };
-Hash_Table<10, 10000> table;
+Hash_Table<23, 10000> Set;
