@@ -24,6 +24,7 @@ class Hash_Table {
     }
 
    public:
+    int end() { return 0; }
     // 插入成功返回 true，否则返回 false，实参填入 idx 则不会再次调用 find 函数查找
 #ifdef VALUE
     bool insert(const int &x, const int &v, int idx = -1)
@@ -31,8 +32,8 @@ class Hash_Table {
     bool insert(const int &x, int idx = -1)
 #endif
     {
-        int ret = idx == -1 ? find(x) : idx;
-        if (ret) return false;
+        int ret = (idx == -1 ? find(x) : idx);
+        if (!ret) return false;
         int cur_key = Hash_code(x);
         ++tot;
         key[tot] = x;
@@ -53,4 +54,4 @@ class Hash_Table {
         return 0;
     }
 };
-Hash_Table<23, 10000> Set;
+Hash_Table<22, (int)2e5> S;
