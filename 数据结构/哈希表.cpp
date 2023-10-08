@@ -33,7 +33,7 @@ class Hash_Table {
 #endif
     {
         int ret = (idx == -1 ? find(x) : idx);
-        if (!ret) return false;
+        if (ret) return false;
         int cur_key = Hash_code(x);
         ++tot;
         key[tot] = x;
