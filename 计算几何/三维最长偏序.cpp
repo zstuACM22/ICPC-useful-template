@@ -7,7 +7,7 @@
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
 
-// 三维最长偏序. 时间: O(nlognlogn), 空间: O(n)
+// 三维最长偏序. 时间: O(nlognlogn), 空间: O(nlogn)
 // 计算三维空间中以每点结束的最长偏序, 要求不存在重合点
 const int MAXN = 100005;
 const int MAXD = 10000005;
