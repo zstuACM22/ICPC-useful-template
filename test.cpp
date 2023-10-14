@@ -6,50 +6,49 @@
 #define endl '\n'
 #pragma GCC optimize(3, "Ofast", "inline")
 using namespace std;
- 
-#define MAXSIZE (1ull << 10)
-char buf[MAXSIZE], *p1 = nullptr, *p2 = nullptr;
-#define isdigit(c) ('0' <= (c) and (c) <= '9')
-#define isblank(c) ((c) == ' ' or (c) == '\t' or (c) == '\r' or (c) == '\n')
-#ifdef LOCAL
-#define gc() getchar()
-#else
-#define gc() (p1 == p2 and (p2 = (p1 = buf) + fread(buf, 1, MAXSIZE, stdin), p1 == p2) ? '\0' : *p1++)
-#endif
 
-template <typename T>
-inline void read(T &x) {
-    x = 0;
-    char c = gc();
-    bool neg = false;
-    while (not isdigit(c)) {
-        neg = true;
-        c = gc();
-    }
-    while (isdigit(c)) {
-        x = (x << 3) + (x << 1) + (c ^ 48);
-        c = gc();
-    }
-    if (neg)
-        x = -x;
+const int MAX = 10000005;
+
+int ele[MAX];
+
+// 枚举 x 的子集, order 为全集元素个数
+int enum_subset(int x, int order) {
+    int cnt = 0;
+    for (int i = x; i; i = (i - 1) & x)
+        ele[cnt++] = i;
+    ele[cnt++] = 0;
+    return cnt;
 }
 
-inline void read(char *s) {
-    char ch = gc();
-    for (; isblank(ch); ch = gc())
-        ;
-    for (; not isblank(ch); ch = gc())
-        *s++ = ch;
-    *s = '\0';
+// 枚举 x 的超集, order 为全集元素个数
+int enum_superset(int x, int order) {
+    int cnt = 0, full = (1ull << order) - 1;
+    for (int i = x; i <= full; i = (i + 1) | x)
+        ele[cnt++] = i;
+    return cnt;
+}
+
+// 枚举全集的子集, order 为全集元素个数
+int enum_subset_of_fullset(int order) {
+    int cnt = 0;
+    for (int i = (1ull << order) - 1; i >= 0; i--)
+        ele[cnt++] = i;
+    return cnt;
+}
+
+// 枚举全集的有 k 个元素的子集, order 为全集元素个数
+int enum_k_order_subset_of_fullset(int k, int order) {
+    int cnt = 0, full = (1ull << order) - 1;
+    for (int i = (1ull << k) - 1, _1, _2; i <= full; _1 = i & -i, _2 = i + _1, i = ((i & ~_2) / _1 >> 1) | _2)
+        ele[cnt++] = i;
+    return cnt;
 }
 
 signed main() {
-    int x;
-    read(x);
-    // cin >> x;
-    char s[1024];
-    read(s);
-    // cin >> s;
-    cout << x << ' ' << s << endl;
+    int cnt = enum_k_order_subset_of_fullset(3, 6);
+    cout << cnt << endl;
+    for (int i = 0; i < cnt; i++)
+        cout << ele[i] << ' ';
+    cout << endl;
     return 0;
 }
