@@ -26,15 +26,12 @@ void dijkstra(int st, int n) {
         vis[x] = true;
         for (pair<int, int> p : edge[x]) {
             int y = p.first, w = p.second;
-            if (dis[y] > dis[x] + w) {
+            if (dis[y] > dis[x] + w)
                 dis[y] = dis[x] + w;
-            }
         }
         x = -1;
-        for (int i = 1; i <= n; i++) {
-            if (not vis[i] and (x == -1 or dis[x] > dis[i])) {
+        for (int i = 1; i <= n; i++)
+            if (not vis[i] and (x == -1 or dis[x] > dis[i]))
                 x = i;
-            }
-        }
     }
 }
