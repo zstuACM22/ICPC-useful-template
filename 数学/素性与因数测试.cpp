@@ -98,6 +98,8 @@ int Pollard_Rho(int n) {
 int divisors[128];
 int prime_divisors(int x) {
     int cnt = 0, p = 0;
+    if (x == 1) 
+        return 0;
     divisors[cnt++] = x;
     while (p < cnt) {
         int x = divisors[p];
